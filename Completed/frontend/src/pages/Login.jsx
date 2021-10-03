@@ -1,15 +1,12 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { saveUserToken } from "../utilities/localStorageUtils";
 import { useHistory } from "react-router-dom";
-
 import config from "../config/config";
-import Title from "../layout/Title";
-import Header from "../layout/Header";
+import PageLayout from "../layout/PageLayout";
 
 const Login = () => {
-    const toastTiming = config.toastTiming;
     const history = useHistory();
 
     // State declaration
@@ -58,20 +55,7 @@ const Login = () => {
     };
 
     return (
-        <>
-            <ToastContainer
-                position="top-center"
-                autoClose={toastTiming}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-            />
-            <Title title="Login" />
-            <Header />
+        <PageLayout title="Login">
             <div className="c-Login">
                 {/* Login Card */}
                 <form
@@ -111,7 +95,7 @@ const Login = () => {
                     {/* Todo: Add sign up button */}
                 </form>
             </div>
-        </>
+        </PageLayout>
     );
 };
 

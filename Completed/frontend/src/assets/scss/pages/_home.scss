@@ -1,5 +1,4 @@
 .c-Home {
-    min-height: calc(100vh - 60px);
     &__Checkout {
         display: flex;
         justify-content: center;
@@ -8,6 +7,25 @@
         background-color: rgb(34, 24, 56);
         color: white;
         padding: 50px 0;
+    }
 
+    &__Cards {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        background-color: #f5f5f5;
+        padding: 50px 0;
+        a {
+            font-weight: bold;
+            color: $stripe-purple;
+            margin-bottom: 10px;
+            &:hover {
+                opacity: 0.8;
+            }
+            &:active {
+                opacity: 0.7;
+            }
+        }
     }
 }

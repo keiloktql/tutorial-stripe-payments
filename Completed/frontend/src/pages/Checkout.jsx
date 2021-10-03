@@ -15,6 +15,7 @@ import { handleCopyToClipboard } from "../utilities/copyToClipboardUtils";
 import jwt_decode from "jwt-decode";
 import CheckoutSuccess from '../common/CheckoutSuccess';
 import Spinner from 'react-bootstrap/Spinner'
+import PageLayout from "../layout/PageLayout";
 
 const Checkout = () => {
 
@@ -158,23 +159,10 @@ const Checkout = () => {
     };
 
     return (
-        <>
-            <ToastContainer
-                position="top-center"
-                autoClose={toastTiming}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-            />
-            <Title title="Checkout" />
-            <Header />
+        <PageLayout title="Checkout">
             <div className="c-Checkout">
                 {
-                    !paymentSuccess ?
+                    paymentSuccess ?
                         <CheckoutSuccess /> :
                         <>
                             <h1>One Time Payment Demo</h1>
@@ -236,7 +224,7 @@ const Checkout = () => {
                 }
             </div>
 
-        </>
+        </PageLayout>
     )
 }
 

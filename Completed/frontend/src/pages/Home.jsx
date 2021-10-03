@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import Title from '../layout/Title';
 import axios from "axios";
 import config from '../config/config';
-import Header from "../layout/Header";
 import { getToken } from '../utilities/localStorageUtils';
 import { useHistory } from "react-router";
 import ProductCard from "../common/ProductCard";
+import { NavLink } from "react-router-dom";
+import CreditCard from "../common/CreditCard";
+import PageLayout from "../layout/PageLayout";
 
 const Home = () => {
 
@@ -36,7 +37,7 @@ const Home = () => {
 
         if (componentMounted) {
           const productsData = productsResponse.data;
-          
+
           if (productsData.length > 0) {
             setProductInfo(() => ({
               id: productsData[0].product_id,
@@ -60,36 +61,29 @@ const Home = () => {
 
   return (
     <>
-      <Title title="Home" />
-      <Header />
-      <div className="c-Home">
+      <PageLayout title="Home">
+        <div className="c-Home">
+          {/* Checkout */}
+          <div className="c-Home__Checkout">
+            <h1>One Time Payment Demo</h1>
+            <p>You will be redirected to the checkout page to fill in billing details</p>
+            <ProductCard
+              imageLink={productInfo.imageLink}
+              name={productInfo.name}
+              description={productInfo.description}
+              price={productInfo.price}
+            />
+          </div>
 
-        {/* Checkout */}
-        <div className="c-Home__Checkout">
-          <h1>One Time Payment Demo</h1>
-          <p>You will be redirected to the checkout page to fill in billing details</p>
-          <ProductCard 
-            imageLink = {productInfo.imageLink}
-            name = {productInfo.name}
-            description = {productInfo.description}
-            price = {productInfo.price}
-          />
+          {/* Credit Card */}
+          <div className="c-Home__Cards">
+            <h1>Add Credit Card Demo</h1>
+            <NavLink to="/account" >Go to Account</NavLink>
+            <CreditCard last4="4242" expDate="12/24" />
+          </div>
+
         </div>
-
-        {/* Credit Card */}
-        <div className="c-Home__Cards">
-          <h1>Add Credit Card Demo</h1>
-          <p>You will be redirected to the checkout page to fill in billing details</p>
-        </div>
-
-        {/* Plans */}
-        <div className="c-Home__Plans">
-          <h1>Subscribe to Plans Demo</h1>
-          <p>You are not subscribed to any plans</p>
-        </div>
-
-
-      </div>
+      </PageLayout>
     </>
   );
 };

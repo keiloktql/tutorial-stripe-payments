@@ -1,0 +1,36 @@
+footer {
+    width: 100%;
+    background-color: $stripe-primary;
+    color: white;
+    padding: 20px 0;
+    .c-Footer {
+        width: 55%;
+        margin: auto;
+        .c-Top {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        hr {
+            margin: 20px 0;
+            background-color: white;
+            height: 1px;
+            opacity: 1;
+        }
+
+        .c-Bottom {
+            text-align: center;
+            a {
+                font-weight: bold;
+                color: white;
+                &:hover {
+                    opacity: 0.8;
+                }
+                &:active {
+                    opacity: 0.7;
+                }
+            }
+        }
+    }
+}

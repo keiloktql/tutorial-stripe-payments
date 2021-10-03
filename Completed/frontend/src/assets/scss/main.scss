@@ -12,9 +12,12 @@
 @import "components/buttons";
 @import "components/product-card";
 @import "components/checkout-success";
+@import "components/credit-card";
 
 // Layout styles
 @import "layout/header";
+@import "layout/page-layout";
+@import "layout/footer";
 
 // Pages styles
 @import "pages/checkout";
