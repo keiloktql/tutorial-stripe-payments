@@ -2,6 +2,7 @@
 // const accountController = require("./controllers/account");
 const authController = require("./controllers/auth");
 // const stripeController = require("./controllers/stripe");
+const productController = require("./controllers/product");
 
 // MIDDLEWARES
 const { isLoggedIn } = require("./middlewares/login");

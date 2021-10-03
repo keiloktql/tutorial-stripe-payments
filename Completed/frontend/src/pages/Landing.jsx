@@ -1,10 +1,14 @@
-import React from 'react'
+import React from 'react';
+import Header from "../layout/Header";
+import Title from "../layout/Title";
+import { NavLink } from "react-router-dom";
 
 const Landing = () => {
     return (
-        <div>
-
-        </div>
+        <>
+            <Title title="Deluxe" />
+            <Header />
+        </>
     )
 }
 

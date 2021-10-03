@@ -7,9 +7,12 @@
 
 // Components styles
 @import "components/buttons";
+@import "components/product-card";
 
 // Layout styles
 @import "layout/header";
 
 // Pages styles
+@import "pages/checkout";
+@import "pages/home";
 @import "pages/login";

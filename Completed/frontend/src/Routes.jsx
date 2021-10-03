@@ -6,6 +6,7 @@ import { Route, BrowserRouter as Router, Switch, Redirect } from 'react-router-d
 import Home from './pages/Home';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
+import Checkout from './pages/Checkout';
 
 // Other imports
 import { getToken } from './utilities/localStorageUtils';
@@ -31,6 +32,7 @@ const Routes = () => {
                 </Route>
                 <Route path = "/home" render={(props) => authGuard(Home)(props)} />
                 <Route path = "/landing" render={() => <Landing />} />
+                <Route path = "/Checkout" render={(props) => authGuard(Checkout)(props)} />
             </Switch>
         </Router>
     )

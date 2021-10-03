@@ -1,0 +1,21 @@
+.c-Checkout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px);
+    flex-direction: column;
+    width: 100%;
+    &__Payment-info {
+        width: 500px;
+        .c-Checkout__Card-element {
+            width: calc(100% - 20px);
+            border: 1px solid black;
+            border-radius: 5px 5px 0 0;
+            padding: 9px;
+        }
+        button {
+            border-radius: 0 0 5px 5px;
+            width: 100%;
+        }
+    }
+}

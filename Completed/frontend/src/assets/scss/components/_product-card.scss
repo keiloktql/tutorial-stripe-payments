@@ -1,0 +1,33 @@
+.c-Product-card {
+    margin-top: 50px;
+    width: 500px;
+    border-radius: 5px;
+    background-color: white;
+    color: black;
+
+    &__Top {
+        padding: 20px 0;
+        border: 1px solid rgb(199, 199, 199);
+        border-radius: 5px 5px 0 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        img {
+            width: 50px;
+            height: 48px;
+        }
+
+        .c-Product-card__Info {
+            h1 {
+                font-size: $font-medium;
+            }
+        }
+    }
+    button {
+        width: 100%;
+        border-radius: 0 0 5px 5px;
+    }
+
+
+}

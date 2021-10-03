@@ -21,4 +21,9 @@
     &:active {
         opacity: 0.8;
     }
+
+    &--stripe-purple {
+        color: white;
+        background-color: $stripe-purple;
+    }
 }

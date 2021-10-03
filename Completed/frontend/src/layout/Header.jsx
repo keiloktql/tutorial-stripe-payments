@@ -39,14 +39,14 @@ const Header = () => {
                 {/*Left section  */}
                 <div className="c-Header__Left">
                     <div className="c-Logo">
-                        <NavLink to="/products">Deluxe</NavLink>
+                        <NavLink to="/landing">Deluxe</NavLink>
                     </div>
                 </div>
                 {/* Right section */}
                 <div className="c-Header__Right">
                     <div className="c-Header__Links">
-                        <NavLink to="/products">Products</NavLink>
-                        <NavLink to="/membership">Membership</NavLink>
+                        <NavLink to="/home">Home</NavLink>
+                        <NavLink to="/plans">Plans</NavLink>
                     </div>
                     <div className="c-Header__Icons">
                         <div className="c-Header__Account" ref={ref}>

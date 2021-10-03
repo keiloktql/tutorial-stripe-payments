@@ -1,6 +1,8 @@
 const { Accounts } = require("./src/model_definitions/Accounts");
 const { Passwords } = require("./src/model_definitions/Passwords");
 const { Products } = require("./src/model_definitions/Products");
+const { PaymentMethods } = require("./src/model_definitions/PaymentMethods");
+const { Accounts_PaymentMethods } = require("./src/model_definitions/Accounts_PaymentMethods");
 
 const express = require("express");
 const cors = require("cors");

@@ -11,6 +11,13 @@ module.exports.createPaymentIntent = (totalPrice, stripeCustomerID, email) => st
   receipt_email: email || null
 });
 
+// Update payment intent
+module.exports.updatePaymentIntent = (paymentIntentID, totalPrice) => stripe.paymentIntents.update(
+  paymentIntentID, {
+  amount: totalPrice,
+  currency: "sgd"
+});
+
 // Create customer
 module.exports.createStripeCustomer = (email, username) => stripe.customers.create({
   email,
