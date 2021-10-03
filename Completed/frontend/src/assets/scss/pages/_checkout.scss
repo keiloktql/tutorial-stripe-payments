@@ -7,6 +7,7 @@
     width: 100%;
     &__Payment-info {
         width: 500px;
+        margin: 20px 0;
         .c-Checkout__Card-element {
             width: calc(100% - 20px);
             border: 1px solid black;
@@ -17,5 +18,69 @@
             border-radius: 0 0 5px 5px;
             width: 100%;
         }
+    }
+
+    &__Test-cards {
+
+        .c-Test-cards__Tooltip-title {
+            font-weight: bold;
+            color: $stripe-purple;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+            
+            &:hover {
+                opacity: 0.8;
+            }
+            &:active {
+                opacity: 0.7;
+            }
+        }
+
+        .l-Test-cards__Tooltip {
+            position: relative;
+
+            .c-Test-cards__Tooltip {
+                position: absolute;
+                width: 500px;
+                top: 0px;
+                left: -200px;
+                padding: 20px;
+                box-shadow: 0px 0px 3px 0.3px grey;
+                margin: 20px 0;
+                .c-Test-cards__Info {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    flex-direction: row;
+                    margin: 5px 0;
+                    p {
+                        color: #32325d;
+                        font-size: $font-small;
+                    }
+                    h1 {
+                        font-size: $font-small;
+                        font-weight: bold;
+                        cursor: pointer;
+                        color: $stripe-purple;
+
+                        &:hover {
+                            opacity: 0.8;
+                        }
+                        &:active {
+                            opacity: 0.7;
+                        }
+                    }
+                    &:last-of-type {
+                        margin-top: 15px;
+                    }
+                }
+            }
+        }
+
     }
 }

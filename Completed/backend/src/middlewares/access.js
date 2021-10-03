@@ -17,7 +17,7 @@ module.exports.verifyStripeWebhookRequest = async (req, res, next) => {
                     endpointSecret
                 );
             } catch (err) {
-                console.log(`⚠️  Webhook signature verification failed.`, err.message);
+                console.log(`Webhook signature verification failed.`, err.message);
                 return response.sendStatus(400);
             }
         }

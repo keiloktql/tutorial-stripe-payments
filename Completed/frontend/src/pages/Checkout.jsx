@@ -1,21 +1,29 @@
 import React, { useState, useEffect } from "react";
 import Header from "../layout/Header";
 import Title from "../layout/Title";
-import productImg from '../assets/images/iphone_15_orange.jpg';
 import axios from "axios";
 import { getToken } from '../utilities/localStorageUtils';
 import config from '../config/config';
-import ProductCard from "../common/ProductCard";
+import { toast, ToastContainer } from "react-toastify";
 import useComponentVisible from "../hooks/useComponentVisible";
 import {
     CardElement,
     useStripe,
     useElements,
 } from "@stripe/react-stripe-js";
+import { handleCopyToClipboard } from "../utilities/copyToClipboardUtils";
+import jwt_decode from "jwt-decode";
+import CheckoutSuccess from '../common/CheckoutSuccess';
 
 const Checkout = () => {
 
+    const toastTiming = config.toastTiming;
     const token = getToken();
+    let accountID;
+    if (token) {
+        const decodedToken = jwt_decode(token);
+        accountID = decodedToken.account_id;
+    }
 
     const cardStyle = {
         hidePostalCode: true,
@@ -36,17 +44,8 @@ const Checkout = () => {
         },
     };
 
-
-
     // State declarations
-    const [productInfo, setProductInfo] = useState({
-        id: null,
-        name: null,
-        description: null,
-        price: null,
-        imageLink: null
-    });
-    const [viewTestCardModal, setViewTestCardModal] = useState(false);
+    const [viewTestScenario, setViewTestScenario] = useState(false);
     const [paymentError, setPaymentError] = useState(null);
     const [paymentProcessing, setPaymentProcessing] = useState(false);
     const [paymentDisabled, setPaymentDisabled] = useState(true);
@@ -57,8 +56,8 @@ const Checkout = () => {
     const elements = useElements();
 
     const { ref } = useComponentVisible(
-        viewTestCardModal,
-        setViewTestCardModal
+        viewTestScenario,
+        setViewTestScenario
     );
 
     useEffect(() => {
@@ -67,26 +66,44 @@ const Checkout = () => {
         (async () => {
 
             try {
-                // Get product information
-                const productsResponse = await axios.get(`${config.baseUrl}/products`, {
+                // Get info for account
+                const accountResponse = await axios.get(`${config.baseUrl}/account/${accountID}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
 
                 if (componentMounted) {
-                    const productsData = productsResponse.data;
+                    const accountData = accountResponse.data.account;
 
-                    if (productsData.length > 0) {
-                        setProductInfo(() => ({
-                            id: productsData[0].product_id,
-                            name: productsData[0].name,
-                            description: productsData[0].description,
-                            price: productsData[0].price,
-                            imageLink: productsData[0].imageLink
-                        }));
+                    // Check if user has client secret and payment intent
+                    if (accountData.stripe_payment_intent_id === null) {
+                        // Create new payment intent
+                        const paymentIntent = await axios.post(`${config.baseUrl}/stripe/payment_intents`, {
+                            items: [1] // hardcoded the id of 'iPhone 15' product from our database
+                        }, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        setClientSecret(() => paymentIntent.data.clientSecret);
+                        setPaymentIntentID(() => paymentIntent.data.paymentIntentID);
+                    } else {
+                        // Retrieve existing payment intent and client secret
+                        setClientSecret(() => (accountData.stripe_payment_intent_client_secret));
+                        setPaymentIntentID(() => accountData.stripe_payment_intent_id);
+                        // Update payment intent
+                        await axios.put(`${config.baseUrl}/stripe/payment_intents`, {
+                            paymentIntentID,
+                            items: [1] // hardcoded the id of 'iPhone 15' product from our database
+                        }, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
                     }
                 }
+
             } catch (error) {
                 console.log(error);
             }
@@ -109,53 +126,99 @@ const Checkout = () => {
         setPaymentError(event.error ? event.error.message : "");
     };
 
-    const handleTestCardClick = () => {
-        setViewTestCardModal((prevState) => !prevState);
+    const handleTestScenarioClick = () => {
+        setViewTestScenario((prevState) => !prevState);
     };
 
-    const handleCopyToClipboard = (copyText) => {
-        navigator.clipboard.writeText(copyText);
+    // Confirm card payment
+    const handleFormSubmit = async (event) => {
+        event.preventDefault(); // prevent page from refreshing
+        setPaymentProcessing(() => true); // show loading UI
+
+        const payload = await stripe.confirmCardPayment(clientSecret, {
+            payment_method: {
+                card: elements.getElement(CardElement)
+            },
+        });
+
+        // Check for errors
+        if (payload.error) {
+            setPaymentError(() => `Payment failed! ${payload.error.message}`);
+            setPaymentProcessing(() => false);
+        } else {
+            setPaymentError(() => null);
+            setPaymentProcessing(false);
+            setPaymentSuccess(() => true);
+        }
     };
 
     return (
         <>
+            <ToastContainer
+                position="top-center"
+                autoClose={toastTiming}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             <Title title="Checkout" />
             <Header />
-            <div className="c-Checkout" ref={ref}>
-                <h1>One Time Payment Demo</h1>
-                <p>Click on "Test Cards Available" to copy test card numbers</p>
-                <div className="c-Checkout__Payment-info">
-                    <div className="c-Checkout__Card-element">
-                        <CardElement options={cardStyle} onChange={handleCardInputChange} />
-                    </div>
-                    <button type="button" className="c-Btn c-Btn--stripe-purple">Pay S${productInfo.price ? productInfo.price : "Error"}</button>
-                </div>
-                <span className="c-Checkout__Test-cards" onClick={handleTestCardClick}>
-                    Test Cards
-                </span>
+            <div className="c-Checkout">
                 {
-                    viewTestCardModal ? (
-                        <div classname="c-Test-cards__Tooltip">
-                            <div className="c-Test-cards__Info">
-                                <p>Payment Succeeds</p>
-                                <h1>4242 4242 4242 4242</h1>
-                            </div>
-                            <div className="c-Test-cards__Info">
-                                <p>Authentication required</p>
-                                <h1>4000 0025 0000 3155</h1>
-                            </div>
-                            <div className="c-Test-cards__Info">
-                                <p>Payment is declined</p>
-                                <h1>4000 0000 0000 9995</h1>
-                            </div>
-                            <div className="c-Test-cards__Info">
-                                <p>These test card numbers work with any CVC, postal code and future expiry date.</p>
-                            </div>
-                        </div>
-                    ) :
-                        null
-                }
+                    paymentSuccess ?
+                        <CheckoutSuccess /> :
+                        <>
+                            <h1>One Time Payment Demo</h1>
+                            <p>Click on "Test Scenarios" to copy test cards</p>
+                            <form className="c-Checkout__Payment-info" onSubmit={(event) => handleFormSubmit(event)}>
+                                <div className="c-Checkout__Card-element">
+                                    <CardElement options={cardStyle} onChange={handleCardInputChange} />
+                                </div>
+                                <button type="submit" className="c-Btn c-Btn--stripe-purple">Pay S$1299.90</button>
 
+                                {/* Show any error that happens when processing the payment */}
+                                {paymentError && (
+                                    <div className="card-error" role="alert">
+                                        {paymentError}
+                                    </div>
+                                )}
+                            </form>
+                            <div className="c-Checkout__Test-cards" ref={ref}>
+                                <span className="c-Test-cards__Tooltip-title" onClick={handleTestScenarioClick}>
+                                    Test Scenarios
+                                </span>
+                                {
+                                    viewTestScenario ? (
+                                        <div className="l-Test-cards__Tooltip">
+                                            <div className="c-Test-cards__Tooltip">
+                                                <div className="c-Test-cards__Info">
+                                                    <p>Payment Succeeds</p>
+                                                    <h1 onClick={() => handleCopyToClipboard("4242424242424242")}>4242 4242 4242 4242</h1>
+                                                </div>
+                                                <div className="c-Test-cards__Info">
+                                                    <p>Authentication required</p>
+                                                    <h1 onClick={() => handleCopyToClipboard("4000002500003155")}>4000 0025 0000 3155</h1>
+                                                </div>
+                                                <div className="c-Test-cards__Info">
+                                                    <p>Payment is declined</p>
+                                                    <h1 onClick={() => handleCopyToClipboard("4000000000009995")}>4000 0000 0000 9995</h1>
+                                                </div>
+                                                <div className="c-Test-cards__Info">
+                                                    <p>These test card numbers work with any CVC, postal code and future expiry date.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ) :
+                                        null
+                                }
+
+                            </div>
+                        </>
+                }
             </div>
 
         </>
