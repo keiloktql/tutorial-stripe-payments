@@ -4,7 +4,7 @@ import Title from "../layout/Title";
 import axios from "axios";
 import { getToken } from '../utilities/localStorageUtils';
 import config from '../config/config';
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import useComponentVisible from "../hooks/useComponentVisible";
 import {
     CardElement,
@@ -14,6 +14,7 @@ import {
 import { handleCopyToClipboard } from "../utilities/copyToClipboardUtils";
 import jwt_decode from "jwt-decode";
 import CheckoutSuccess from '../common/CheckoutSuccess';
+import Spinner from 'react-bootstrap/Spinner'
 
 const Checkout = () => {
 
@@ -78,6 +79,7 @@ const Checkout = () => {
 
                     // Check if user has client secret and payment intent
                     if (accountData.stripe_payment_intent_id === null) {
+
                         // Create new payment intent
                         const paymentIntent = await axios.post(`${config.baseUrl}/stripe/payment_intents`, {
                             items: [1] // hardcoded the id of 'iPhone 15' product from our database
@@ -86,12 +88,14 @@ const Checkout = () => {
                                 'Authorization': `Bearer ${token}`
                             }
                         });
+
                         setClientSecret(() => paymentIntent.data.clientSecret);
                         setPaymentIntentID(() => paymentIntent.data.paymentIntentID);
                     } else {
                         // Retrieve existing payment intent and client secret
                         setClientSecret(() => (accountData.stripe_payment_intent_client_secret));
                         setPaymentIntentID(() => accountData.stripe_payment_intent_id);
+
                         // Update payment intent
                         await axios.put(`${config.baseUrl}/stripe/payment_intents`, {
                             paymentIntentID,
@@ -106,6 +110,7 @@ const Checkout = () => {
 
             } catch (error) {
                 console.log(error);
+                // Optional: Set error state and display error page to user
             }
 
         })();
@@ -169,7 +174,7 @@ const Checkout = () => {
             <Header />
             <div className="c-Checkout">
                 {
-                    paymentSuccess ?
+                    !paymentSuccess ?
                         <CheckoutSuccess /> :
                         <>
                             <h1>One Time Payment Demo</h1>
@@ -178,7 +183,17 @@ const Checkout = () => {
                                 <div className="c-Checkout__Card-element">
                                     <CardElement options={cardStyle} onChange={handleCardInputChange} />
                                 </div>
-                                <button type="submit" className="c-Btn c-Btn--stripe-purple">Pay S$1299.90</button>
+                                <button type="submit" className="c-Btn c-Btn--stripe-purple">
+                                    {paymentProcessing ? (
+                                        <>
+                                            <Spinner animation="border" role="status" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            Pay S$1299.90
+                                        </>
+                                    )}
+                                    </button>
 
                                 {/* Show any error that happens when processing the payment */}
                                 {paymentError && (

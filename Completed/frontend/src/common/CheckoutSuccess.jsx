@@ -10,7 +10,7 @@ const CheckoutSuccess = () => {
                 </svg>
             </span>
             <h1>Checkout Successful!</h1>
-            <p>Receipt will be sent via Email (Only when using Stripe production keys)</p>
+            <p>View payment details in the Stripe Dashboard</p>
             <p><NavLink to="/home">Back to Home</NavLink></p>
         </div>
     )
