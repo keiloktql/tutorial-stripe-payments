@@ -3,8 +3,9 @@ import React from 'react';
 import { Route, BrowserRouter as Router, Switch, Redirect } from 'react-router-dom';
 
 // React components import
-import Login from './pages/Login';
 import Home from './pages/Home';
+import Landing from './pages/Landing';
+import Login from './pages/Login';
 
 // Other imports
 import { getToken } from './utilities/localStorageUtils';
@@ -13,7 +14,7 @@ import { getToken } from './utilities/localStorageUtils';
 const authGuard = (Component) => (props) => {
     const token = getToken();
     if (!token) {
-        return (<Redirect to="/login" {...props} />);
+        return (<Redirect to="/landing" {...props} />);
     } else {
         return (<Component {...props} />);
     }
@@ -29,6 +30,7 @@ const Routes = () => {
                     <Redirect to="/home" />
                 </Route>
                 <Route path = "/home" render={(props) => authGuard(Home)(props)} />
+                <Route path = "/landing" render={() => <Landing />} />
             </Switch>
         </Router>
     )

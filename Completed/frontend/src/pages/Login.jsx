@@ -6,6 +6,7 @@ import { useHistory } from "react-router-dom";
 
 import config from "../config/config";
 import Title from "../layout/Title";
+import Header from "../layout/Header";
 
 const Login = () => {
   const toastTiming = config.toastTiming;
@@ -70,6 +71,7 @@ const Login = () => {
         pauseOnHover
       />
       <Title title="Login" />
+      <Header />
       <div className="c-Login">
         {/* Login Card */}
         <form
