@@ -1,0 +1,15 @@
+// Global (General) styles
+a, p, h1, h2, h3, h4, h5, h6, button, label {
+    font-family: $font-family;
+    margin: 0;
+}
+
+body {
+    margin: 0;
+}
+
+body a {
+    text-decoration: none;
+    color: #0D6EFD;
+}
+

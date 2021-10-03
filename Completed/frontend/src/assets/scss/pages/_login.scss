@@ -1,0 +1,57 @@
+.c-Login {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .l-Login__Card {
+        background-color: rgb(255, 255, 255);
+        box-shadow: 0px 0px 3px 0.3px grey;
+        width: 350px;
+
+        .c-Login__Card {
+
+            width: 85%;
+            margin: 50px auto;
+
+            .c-Card {
+                &__Header {
+                    margin-bottom: 20px;
+                    h1 {
+                        text-align: center;
+                        width: 100%;
+                        font-weight: bold;
+                        color: $stripe-text-dark;
+                    }
+                }
+
+                &__Input {
+                    display: flex;
+                    flex-direction: column;
+
+                    label {
+                        font-weight: bold;
+                        font-size: $font-small;
+                    }
+
+                    input {
+                        border: 1px solid black;
+                        border-radius: 5px;
+                        padding: 5px;
+                        margin: 10px 0;
+                        font-size: $font-small;
+                    }
+                }
+            }
+            button {
+                margin-top: 20px;
+                width: 100%;
+                cursor: pointer;
+                box-shadow: none;
+                background-color: $stripe-purple;
+                color: white;
+            }
+        }
+    }
+}
