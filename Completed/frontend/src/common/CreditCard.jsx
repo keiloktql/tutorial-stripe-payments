@@ -6,7 +6,7 @@ import visaWhite from "../assets/images/visa-white.png";
 const CreditCard = ({ last4, expDate }) => {
 
     return (
-        <div className="c-Credit-card c-Credit-card--bg-var-1">
+        <figure className="c-Credit-card c-Credit-card--bg-var-1">
             <div className="c-Credit-card__Logo">
                 <div className="c-Credit-card__IMG c-IMG__Visa">
                     <img src={visaWhite} alt="Credit Card Brand" />
@@ -24,7 +24,7 @@ const CreditCard = ({ last4, expDate }) => {
                 <h1>VALID<br />THRU</h1>
                 <p>{expDate ? expDate : "Error"}</p>
             </div>
-        </div>
+        </figure>
     )
 }
 

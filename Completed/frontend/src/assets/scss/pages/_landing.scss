@@ -1,0 +1,36 @@
+.c-Landing {
+    &__Welcome {
+        padding: 100px 0;
+        .c-Welcome__Description {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 75%;
+            margin: auto;
+            text-align: center;
+            h1 {
+                color: $stripe-primary;
+            }
+            a {
+                color: $stripe-purple;
+                font-weight: bold;
+                &:hover {
+                    opacity: 0.8;
+                }
+                &:active {
+                    opacity: 0.7;
+                }
+            }
+        }
+
+    }
+
+    &__Register {
+
+    }
+
+    &__Plans {
+
+    }
+}

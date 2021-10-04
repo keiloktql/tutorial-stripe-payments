@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { Op } = require("sequelize");
 
 const { jwt: { secret: jwtSecret } } = require("../config/config");
 const { Accounts } = require("../model_definitions/Accounts");
@@ -7,10 +8,19 @@ const { Passwords } = require("../model_definitions/Passwords");
 
 module.exports.clientLogin = async (req, res) => {
     try {
-        const { username, password } = req.body;
+        const { usernameOrEmail, password } = req.body;
 
         const account = await Accounts.findOne({
-            where: { username },
+            where: { 
+                [Op.or]: [
+                    {
+                        username: usernameOrEmail
+                    },
+                    {
+                        email: usernameOrEmail
+                    }
+                ]
+             },
             include: {
                 model: Passwords,
                 as: "passwords",

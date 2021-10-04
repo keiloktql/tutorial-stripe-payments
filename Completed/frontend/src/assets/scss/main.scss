@@ -13,6 +13,8 @@
 @import "components/product-card";
 @import "components/checkout-success";
 @import "components/credit-card";
+@import "components/loading";
+
 
 // Layout styles
 @import "layout/header";
@@ -22,4 +24,6 @@
 // Pages styles
 @import "pages/checkout";
 @import "pages/home";
+@import "pages/landing";
 @import "pages/login";
+@import "pages/sign-up";

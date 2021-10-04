@@ -14,7 +14,7 @@ import {
 import { handleCopyToClipboard } from "../utilities/copyToClipboardUtils";
 import jwt_decode from "jwt-decode";
 import CheckoutSuccess from '../common/CheckoutSuccess';
-import Spinner from 'react-bootstrap/Spinner'
+import Spinner from 'react-bootstrap/Spinner';
 import PageLayout from "../layout/PageLayout";
 
 const Checkout = () => {

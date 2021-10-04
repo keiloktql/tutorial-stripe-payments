@@ -7,6 +7,9 @@ import Home from './pages/Home';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Checkout from './pages/Checkout';
+import Plans from './pages/Plans';
+import SignUp from './pages/SignUp';
+
 
 // Other imports
 import { getToken } from './utilities/localStorageUtils';
@@ -30,9 +33,11 @@ const Routes = () => {
                 <Route exact path="/">
                     <Redirect to="/home" />
                 </Route>
-                <Route path = "/home" render={(props) => authGuard(Home)(props)} />
+                <Route path = "/home" render={() => <Home />} />
                 <Route path = "/landing" render={() => <Landing />} />
-                <Route path = "/Checkout" render={(props) => authGuard(Checkout)(props)} />
+                <Route path = "/checkout" render={(props) => authGuard(Checkout)(props)} />
+                <Route path = "/signup" render={() => <SignUp />} />
+                <Route path = "/plans" render={() => <Plans />} />
             </Switch>
         </Router>
     )
