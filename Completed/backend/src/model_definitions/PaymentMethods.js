@@ -4,32 +4,28 @@ const db = require("../config/connection");
 const PaymentMethods = db.define(
     "PaymentMethods",
     {
-        payment_method_id: {
+        stripe_payment_method_id: {
             type: DataTypes.STRING(255),
             primaryKey: true,
             allowNull: false,
             autoIncrement: false
         },
-        payment_method_fingerprint: {
+        stripe_payment_method_fingerprint: {
             type: DataTypes.STRING(255),
             allowNull: false
         },
-        card_exp_date: {
+        stripe_card_exp_date: {
             type: DataTypes.STRING(255),
             allowNull: false
         },
-        card_last_four_digit: {
+        stripe_card_last_four_digit: {
             type: DataTypes.STRING(255),
             allowNull: false
         },
-        card_type: {
+        stripe_card_type: {
             type: DataTypes.STRING(255),
             allowNull: false
         },
-        card_bg_variation: {
-            type: DataTypes.INTEGER.UNSIGNED,
-            allowNull: false
-        }
     },
     {
         tableName: "payment_methods",

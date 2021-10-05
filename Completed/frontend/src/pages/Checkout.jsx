@@ -159,9 +159,11 @@ const Checkout = () => {
 
         // Check for errors
         if (payload.error) {
+            // Payment error
             setPaymentError(() => `Payment failed! ${payload.error.message}`);
             setPaymentProcessing(() => false);
         } else {
+            // Payment success
             setPaymentError(() => null);
             setPaymentProcessing(false);
             setPaymentSuccess(() => true);

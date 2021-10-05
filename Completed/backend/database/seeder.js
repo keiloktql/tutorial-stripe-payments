@@ -2,6 +2,7 @@
 const { Accounts } = require("../src/model_definitions/Accounts");
 const { Passwords } = require("../src/model_definitions/Passwords");
 const { Products } = require("../src/model_definitions/Products");
+const { Plans } = require("../src/model_definitions/Plans");
 
 // SERVICES IMPORT
 const { createStripeCustomer } = require("../src/services/stripe");
@@ -9,6 +10,7 @@ const { createStripeCustomer } = require("../src/services/stripe");
 // NPM modules import
 const bcrypt = require("bcryptjs");
 const chalk = require('chalk');
+
 
 module.exports.seeder = async () => {
     try {
@@ -25,7 +27,6 @@ module.exports.seeder = async () => {
                 passwords: [{
                     password: bcrypt.hashSync("123", 10)
                 }],
-                fk_membership_id: 1,
                 stripe_customer_id: stripeCustomerID
             }, {
                 include: ["passwords"]
@@ -38,6 +39,24 @@ module.exports.seeder = async () => {
                 description: "Better than Apple.",
                 image_link: "http://localhost:3000/static/media/iphone_15_orange.d6d6f070.jpg"
             });
+
+            // Insert plans
+            await Plans.bulkCreate([
+                {
+                    name: "Standard",
+                    price: "9.90",
+                    description: "It's now or never, sign up now to waste money!",
+                    stripe_product_id: "",
+                    stripe_price_id: ""
+                },
+                {
+                    name: "Premium",
+                    price: "15.90",
+                    description: "A slightly more expensive plan than standard plan.",
+                    stripe_product_id: "",
+                    stripe_price_id: ""
+                },
+            ])
         
         console.log(chalk.green("SEEDING COMPLETE"));
     } catch (error) {

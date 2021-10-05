@@ -8,6 +8,15 @@ module.exports.findAccountByID = (accountID) => Accounts.findByPk(accountID, {
     }] 
 });
 
+module.exports.createAccount = (username, email, password, stripeCustomerID) => Accounts.create({
+    username,
+    email,
+    passwords: [{
+        password: bcrypt.hashSync(password, 10)
+    }],
+    stripe_customer_id: stripeCustomerID
+});
+
 module.exports.updateAccountByID = (accountID, content) => Accounts.update({
     ...content
 }, {

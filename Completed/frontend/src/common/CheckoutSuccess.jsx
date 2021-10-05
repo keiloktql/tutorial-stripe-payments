@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
-const CheckoutSuccess = () => {
+const CheckoutSuccess = ({description}) => {
     return (
         <div className="c-Checkout-success">
             <span>
@@ -10,7 +10,7 @@ const CheckoutSuccess = () => {
                 </svg>
             </span>
             <h1>Checkout Successful!</h1>
-            <p>View payment details in the Stripe Dashboard</p>
+            <p>{description ? description : "View payment details in the Stripe Dashboard"}</p>
             <p><NavLink to="/home">Back to Home</NavLink></p>
         </div>
     )

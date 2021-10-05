@@ -1,4 +1,4 @@
-const { findAccountByID } = require('../models/account');
+const { findAccountByID, createAccount } = require('../models/account');
 const { createStripeCustomer } = require('../services/stripe');
 
 // Get account by ID
@@ -42,7 +42,7 @@ module.exports.createAccount = async (req, res) => {
         const stripeCustomerID = customer.id;
 
         // Create account in our database
-        const acconut 
+        await createAccount(username, email, password, stripeCustomerID);
 
     } catch (error) {
         console.log(error);
