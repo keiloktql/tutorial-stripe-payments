@@ -24,6 +24,7 @@ module.exports = router => {
 
     // ACCOUNTS
     router.get("/api/v1/account/:accountID", isLoggedIn, accountController.findAccountByID);
+    router.post("/api/v1/account", accountController.createAccount);
 
     // STRIPE PAYMENT
     router.post("/api/v1/stripe/payment_intents", isLoggedIn, calculateProductsTotalPrice, stripeController.createPaymentIntent);

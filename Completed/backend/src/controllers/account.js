@@ -1,4 +1,5 @@
 const { findAccountByID } = require('../models/account');
+const { createStripeCustomer } = require('../services/stripe');
 
 // Get account by ID
 
@@ -24,3 +25,27 @@ module.exports.findAccountByID = async (req, res) => {
         return res.status(500).send("Error in controller > account.js! " + error);
     }
 }
+
+// Create account
+module.exports.createAccount = async (req, res) => {
+    try {
+        const {email, username, password} = req.body;
+
+        // Didn't do output sanitization, validation checks
+
+        if (!email || !username || !password) return res.status(400).json({
+            message: `Missing fields`
+        });
+
+        // Create account in stripe
+        const customer = createStripeCustomer(email, username);
+        const stripeCustomerID = customer.id;
+
+        // Create account in our database
+        const acconut 
+
+    } catch (error) {
+        console.log(error);
+        return res.status(500).send("Error in controller > account.js! " + error);
+    }
+};
