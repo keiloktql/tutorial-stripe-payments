@@ -1,11 +1,26 @@
 import React from 'react';
+import PlansCard from '../common/PlansCard';
 import PageLayout from "../layout/PageLayout";
 
 const Plans = () => {
     return (
         <PageLayout>
-            <div className = "c-Plans">
-                
+            <div className="c-Plans">
+                <h1 className="c-Plans__Heading">Choose the Plan that's Right for You</h1>
+                <div className="c-Plans__Cards">
+                    <PlansCard 
+                        name="Standard"
+                        price="9.90"
+                        description="It's now or never, sign up now to waste money!"
+                        planID="1"
+                    />
+                    <PlansCard 
+                        name="Premium"
+                        price="15.90"
+                        description="A slightly more expensive plan than standard plan."
+                        planID="2"
+                    />
+                </div>
             </div>
         </PageLayout>
     )

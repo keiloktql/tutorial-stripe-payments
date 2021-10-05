@@ -1,0 +1,63 @@
+.c-Plans-card {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 50px;
+    max-width: 300px;
+    min-width: 300px;
+    margin: 25px 50px;
+    border-radius: 5px;
+
+    &--Standard {
+        background-color: $stripe-text-dark;
+    }
+
+    &--Premium {
+        background-color: $stripe-purple;
+    }
+
+    &__Title {
+        h1 {
+            color: white;
+            padding-bottom: 10px;
+            padding-top: 0;
+            font-weight: 400;
+        }
+    }
+
+    &__Price {
+        h1 {
+            color: white;
+            padding: 0;
+            font-weight: bolder;
+        }
+
+        p {
+            text-align: center;
+        }
+
+        padding-bottom: 10px;
+    }
+
+    &__Description {
+        padding-bottom: 10px;
+    }
+
+    &__Btn {
+        button {
+            color: $stripe-text-dark;
+            font-weight: 600;
+            padding: 9px 12px;
+            border-radius: 3px;
+            border: none;
+            cursor: pointer;
+
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+    }
+
+}

@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Header from "../layout/Header";
-import Title from "../layout/Title";
 import axios from "axios";
 import { getToken } from '../utilities/localStorageUtils';
 import config from '../config/config';
-import { ToastContainer } from "react-toastify";
 import useComponentVisible from "../hooks/useComponentVisible";
 import {
     CardElement,
@@ -16,10 +13,11 @@ import jwt_decode from "jwt-decode";
 import CheckoutSuccess from '../common/CheckoutSuccess';
 import Spinner from 'react-bootstrap/Spinner';
 import PageLayout from "../layout/PageLayout";
+import { useHistory } from "react-router";
 
 const Checkout = () => {
 
-    const toastTiming = config.toastTiming;
+    const history = useHistory();
     const token = getToken();
     let accountID;
     if (token) {
@@ -111,6 +109,10 @@ const Checkout = () => {
 
             } catch (error) {
                 console.log(error);
+                const errCode = error.response.status;
+                if (errCode === 401) {
+                    history.push("/logged-out");
+                }
                 // Optional: Set error state and display error page to user
             }
 
@@ -135,6 +137,14 @@ const Checkout = () => {
     const handleTestScenarioClick = () => {
         setViewTestScenario((prevState) => !prevState);
     };
+
+    const handleTestScenarioMouse = (type) => {
+        if (type === "enter") {
+            setViewTestScenario(() => true);
+        } else {
+            setViewTestScenario(() => false);
+        }
+    }
 
     // Confirm card payment
     const handleFormSubmit = async (event) => {
@@ -171,7 +181,11 @@ const Checkout = () => {
                                 <div className="c-Checkout__Card-element">
                                     <CardElement options={cardStyle} onChange={handleCardInputChange} />
                                 </div>
-                                <button type="submit" className="c-Btn c-Btn--stripe-purple">
+                                <button
+                                    type="submit"
+                                    className={paymentDisabled || paymentDisabled ? "c-Btn c-Btn--stripe-purple  c-Btn--disabled" : "c-Btn c-Btn--stripe-purple"}
+                                    disabled={paymentProcessing || paymentDisabled}
+                                >
                                     {paymentProcessing ? (
                                         <>
                                             <Spinner animation="border" role="status" />
@@ -181,7 +195,7 @@ const Checkout = () => {
                                             Pay S$1299.90
                                         </>
                                     )}
-                                    </button>
+                                </button>
 
                                 {/* Show any error that happens when processing the payment */}
                                 {paymentError && (
@@ -190,35 +204,36 @@ const Checkout = () => {
                                     </div>
                                 )}
                             </form>
-                            <div className="c-Checkout__Test-cards" ref={ref}>
+                            <div className="c-Checkout__Test-cards" ref={ref} onMouseEnter={() => handleTestScenarioMouse("enter")} onMouseLeave={() => handleTestScenarioMouse("leave")}>
                                 <span className="c-Test-cards__Tooltip-title" onClick={handleTestScenarioClick}>
                                     Test Scenarios
                                 </span>
+                                <div className="l-Test-cards__Tooltip"> 
                                 {
                                     viewTestScenario ? (
-                                        <div className="l-Test-cards__Tooltip">
-                                            <div className="c-Test-cards__Tooltip">
-                                                <div className="c-Test-cards__Info">
-                                                    <p>Payment Succeeds</p>
-                                                    <h1 onClick={() => handleCopyToClipboard("4242424242424242")}>4242 4242 4242 4242</h1>
-                                                </div>
-                                                <div className="c-Test-cards__Info">
-                                                    <p>Authentication required</p>
-                                                    <h1 onClick={() => handleCopyToClipboard("4000002500003155")}>4000 0025 0000 3155</h1>
-                                                </div>
-                                                <div className="c-Test-cards__Info">
-                                                    <p>Payment is declined</p>
-                                                    <h1 onClick={() => handleCopyToClipboard("4000000000009995")}>4000 0000 0000 9995</h1>
-                                                </div>
-                                                <div className="c-Test-cards__Info">
-                                                    <p>These test card numbers work with any CVC, postal code and future expiry date.</p>
-                                                </div>
+
+                                        <div className="c-Test-cards__Tooltip">
+                                            <div className="c-Test-cards__Info">
+                                                <p>Payment Succeeds</p>
+                                                <h1 onClick={() => handleCopyToClipboard("4242424242424242")}>4242 4242 4242 4242</h1>
+                                            </div>
+                                            <div className="c-Test-cards__Info">
+                                                <p>Authentication required</p>
+                                                <h1 onClick={() => handleCopyToClipboard("4000002500003155")}>4000 0025 0000 3155</h1>
+                                            </div>
+                                            <div className="c-Test-cards__Info">
+                                                <p>Payment is declined</p>
+                                                <h1 onClick={() => handleCopyToClipboard("4000000000009995")}>4000 0000 0000 9995</h1>
+                                            </div>
+                                            <div className="c-Test-cards__Info">
+                                                <p>These test card numbers work with any CVC, postal code and future expiry date.</p>
                                             </div>
                                         </div>
+
                                     ) :
                                         null
                                 }
-
+                                </div>
                             </div>
                         </>
                 }

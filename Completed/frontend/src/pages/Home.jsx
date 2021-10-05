@@ -50,6 +50,10 @@ const Home = () => {
         }
       } catch (error) {
         console.log(error);
+        const errCode = error.response.status;
+        if (errCode === 401) {
+          history.push("/logged-out");
+        }
       }
 
     })();

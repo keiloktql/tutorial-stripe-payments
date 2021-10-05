@@ -1,0 +1,93 @@
+.c-Plans-checkout {
+  display: flex;
+  align-items: center;
+  width: 75%;
+  margin: auto;
+  min-height: calc(100vh - 60px);
+  flex-direction: column;
+
+  &__Heading {
+      padding-top: 100px;
+      padding-bottom: 20px;
+      text-align: center;
+      h1 {
+        color: $stripe-text-dark;
+        font-weight: bolder;
+      }
+
+  }
+
+  &__Payment-details {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    .c-Plans-checkout {
+      &__Card-info {
+        width: 50%;
+        min-width: 500px;
+        h2 {
+          margin-top: 20px;
+          font-size: $font-medium;
+          font-weight: bold;
+          color: $stripe-text-dark;
+        }
+
+        .c-Card-info__Payment-methods {
+          margin-top: 20px;
+        }
+
+        .l-Card-info__Add-card {
+          margin-top: 20px;
+
+          &--disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+
+          .c-Card-info__Add-card {
+            padding: 10px 20px;
+            border: 1px solid #172b4d;
+            border-radius: 5px;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -o-user-select: none;
+            user-select: none;
+
+            p {
+              display: flex;
+              flex-direction: row;
+              align-items: center;
+
+              .c-Add-card__Icon {
+                margin-right: 20px;
+              }
+            }
+
+            &:hover {
+              opacity: 0.7;
+            }
+
+            &:active {
+              opacity: 0.8;
+            }
+
+            &--disabled {
+              pointer-events: none;
+            }
+          }
+        }
+      }
+    }
+
+    button {
+        width: 50%;
+        min-width: 500px;
+        margin-top: 20px;
+    }
+  }
+}

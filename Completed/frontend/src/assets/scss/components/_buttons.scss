@@ -26,6 +26,11 @@
         opacity: 0.8;
     }
 
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
     &--stripe-purple {
         color: white;
         background-color: $stripe-purple;
@@ -35,6 +40,17 @@
         color: $stripe-purple;
         background-color: transparent;
     }
+
+    &--stripe-primary {
+        color: white;
+        background-color: $stripe-primary;
+    }
+
+    &--empty {
+        background-color: transparent;
+        color: $stripe-primary;
+    }
+
     &--disabled {
         cursor: not-allowed !important;
         opacity: 0.7;

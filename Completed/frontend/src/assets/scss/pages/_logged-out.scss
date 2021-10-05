@@ -1,0 +1,25 @@
+.c-Logged-out {
+    min-height: calc(100vh - 60px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    h1 {
+        font-size: $font-large;
+        font-weight: bold;
+        color: $stripe-text-dark;
+    }
+
+    a {
+        color: $stripe-purple;
+        font-size: $font-small;
+        font-weight: 600;
+
+        &:hover {
+            opacity: 0.7;
+        }
+        &:active {
+            opacity: 0.8;
+        }
+    }
+}

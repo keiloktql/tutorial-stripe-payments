@@ -1,0 +1,95 @@
+.l-Select-payment-method {
+  margin-top: 10px;
+  &--disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  .c-Select-payment-method {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border: 1px solid #172b4d;
+    border-radius: 5px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    position: relative;
+    &--disabled {
+      pointer-events: none;
+    }
+
+    &:hover {
+      opacity: 0.7;
+    }
+    &:active {
+      opacity: 0.8;
+    }
+
+    &--selected {
+      border: 1px solid $stripe-purple;
+      box-shadow: 0px 0px 5px 0.01px $stripe-purple;
+    }
+
+    p {
+      margin-right: 10px;
+    }
+
+    &__Banner {
+      display: none;
+
+      &--selected {
+        display: block;
+        position: absolute;
+        width: 100%;
+        font-size: 9px;
+        background-color: $stripe-purple;
+        color: white;
+        text-align: center;
+        font-weight: bold;
+        top: 0px;
+        left: 0px;
+      }
+    }
+
+    &__Left {
+      display: flex;
+      flex-direction: row;
+      .c-SVG {
+        margin-right: 20px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        &__Visa {
+          svg {
+            width: 30.799px;
+            height: 10px;
+          }
+        }
+
+        &__Master {
+          svg {
+            width: 30.799px;
+            height: 21.8px;
+          }
+        }
+
+        &__Amex {
+          svg {
+            width: 35px;
+            height: 35px;
+          }
+        }
+      }
+    }
+
+    &__Right {
+    }
+  }
+}

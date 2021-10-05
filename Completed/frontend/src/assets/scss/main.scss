@@ -11,10 +11,12 @@
 // Components styles
 @import "components/buttons";
 @import "components/product-card";
+@import "components/plans-card";
 @import "components/checkout-success";
 @import "components/credit-card";
 @import "components/loading";
-
+@import "components/setup-payment-method";
+@import "components/select-payment-method";
 
 // Layout styles
 @import "layout/header";
@@ -22,8 +24,12 @@
 @import "layout/footer";
 
 // Pages styles
+@import "pages/account";
 @import "pages/checkout";
 @import "pages/home";
 @import "pages/landing";
+@import "pages/logged-out";
 @import "pages/login";
+@import "pages/plans";
+@import "pages/plans-checkout";
 @import "pages/sign-up";
