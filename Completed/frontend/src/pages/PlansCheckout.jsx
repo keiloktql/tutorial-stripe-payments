@@ -63,7 +63,11 @@ const PlansCheckout = ({ match }) => {
 
         (async () => {
             try {
-                const accountResponse = await axios.get(`${config.baseUrl}/account/${accountID}`, );
+                const accountResponse = await axios.get(`${config.baseUrl}/account/${accountID}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
                 const accountData = accountResponse.data;
     
                 if (componentMounted) {

@@ -65,4 +65,4 @@ Billings.belongsTo(Subscriptions, {
     as: "subscription"
 });
 
-module.exports = { Subscriptions };
+module.exports = { Billings };

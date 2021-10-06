@@ -271,21 +271,6 @@ const Account = () => {
                             <p>This demo does not contain payment history feature.</p>
                         </div>
                     </div>
-
-                    <hr />
-                    <div className="c-Payment-history__Details">
-                        {
-                            paymentHistory.length === 0 ?
-                                <p>No Payment History Found!</p>
-                                :
-                                <BootstrapTable
-                                    bordered={false}
-                                    keyField="orderID"
-                                    data={paymentHistory}
-                                    columns={paymentHistoryColumn}
-                                />
-                        }
-                    </div>
                 </div>
 
                 {/* Membership */}

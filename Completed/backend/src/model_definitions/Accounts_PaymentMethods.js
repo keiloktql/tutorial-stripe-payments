@@ -25,7 +25,7 @@ const Accounts_PaymentMethods = db.define(
             allowNull: false,
             references: {
                 model: PaymentMethods,
-                key: "payment_method_id"
+                key: "stripe_payment_method_id"
             },
         },
     },
@@ -48,7 +48,7 @@ Accounts.belongsToMany(PaymentMethods, {
 
 PaymentMethods.belongsToMany(Accounts, {
     through: Accounts_PaymentMethods, // using our own join table
-    foreignKey: "payment_method_id",
+    foreignKey: "fk_payment_methods_id",
     as: {
         singular: "payment_method",
         plural: "payment_methods"

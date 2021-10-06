@@ -57,8 +57,10 @@ const Subscriptions = db.define(
             allowNull: true
         },
         stripe_next_billing_date: {
-
+            type: DataTypes.STRING(255),
+            allowNull: true,
         },
+        
         // to add start date here too and subscription status
     },
     {

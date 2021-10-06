@@ -20,7 +20,9 @@ const PlansCard = ({ name, price, description, planID }) => {
             <div className="c-Plans-card__Btn">
                 <button type="button" onClick={() => history.push(`/plans/payment/${name?.toLowerCase()}`)}>Get Started</button>
             </div>
-
+            <div className = "c-Plans-card__Free-trial">
+                <p><i><b>7 Day Free Trial</b> for first time subscribers</i></p>
+            </div>
         </div>
     )
 }

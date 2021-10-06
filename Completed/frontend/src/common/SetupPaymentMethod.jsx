@@ -68,59 +68,62 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
         event.preventDefault();
         elements.getElement(CardElement).update({ disabled: true });
         setCardSetupProcessing(() => true);
-        if (!stripe || !elements) {
+
+        if (!stripe || !elements || !clientSecret || !setupIntentID) {
             // Stripe.js has not yet loaded.
             // Make sure to disable form submission until Stripe.js has loaded.
-            return;
-        }
-
-        const result = await stripe.confirmCardSetup(clientSecret, {
-            payment_method: {
-                card: elements.getElement(CardElement)
-            },
-        });
-
-        if (result.error) {
-            setCardSetupError(() => result.error.message);
             setCardSetupProcessing(() => false);
-            // Display result.error.message in your UI.
             elements.getElement(CardElement).update({ disabled: false });
+            setCardSetupError(() => "Error! Please try again later!");
         } else {
-            // The setup has succeeded. Display a success message and send
-            // result.setupIntent.payment_method to your server to save the
-            // card to a Customer
+            const result = await stripe.confirmCardSetup(clientSecret, {
+                payment_method: {
+                    card: elements.getElement(CardElement)
+                },
+            });
 
-            // Obtain payment method id
-            const stripePaymentMethodID = result.setupIntent.payment_method;
-
-            // Verify stripePaymentMethod fingerprint doesn't already exist
-            try {
-                const verifyPaymentMethodDuplicate = await axios.post(`${config.baseUrl}/stripe/verify_payment_method_setup`, {
-                    stripePaymentMethodID
-                }, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (verifyPaymentMethodDuplicate.data.duplicate) {
-                    setCardSetupError(() => "Error! Card already exists!");
-                    elements.getElement(CardElement).update({ disabled: false });
-                    setCardSetupProcessing(() => false);
-
-                } else {
-                    elements.getElement(CardElement).clear();
-                    setRerender((prevState) => !prevState);    // tell parent component to rerender to see changes
-                    setCardSetupSuccess(() => true);
-                    setCardSetupProcessing(() => false);
-                    setCardSetupError(() => null);
-                }
-            } catch (error) {
-                console.log(error);
+            if (result.error) {
+                setCardSetupError(() => result.error.message);
+                setCardSetupProcessing(() => false);
+                // Display result.error.message in your UI.
                 elements.getElement(CardElement).update({ disabled: false });
-                setCardSetupError(() => "Error! Please try again later!");
-            }
+            } else {
+                // The setup has succeeded. Display a success message and send
+                // result.setupIntent.payment_method to your server to save the
+                // card to a Customer
 
+                // Obtain payment method id
+                const stripePaymentMethodID = result.setupIntent.payment_method;
+
+                // Verify stripePaymentMethod fingerprint doesn't already exist
+                try {
+                    const verifyPaymentMethodDuplicate = await axios.post(`${config.baseUrl}/stripe/verify_payment_method_setup`, {
+                        stripePaymentMethodID
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (verifyPaymentMethodDuplicate.data.duplicate) {
+                        setCardSetupError(() => "Error! Card already exists!");
+                        elements.getElement(CardElement).update({ disabled: false });
+                        setCardSetupProcessing(() => false);
+
+                    } else {
+                        elements.getElement(CardElement).clear();
+                        setRerender((prevState) => !prevState);    // tell parent component to rerender to see changes
+                        setCardSetupSuccess(() => true);
+                        setCardSetupProcessing(() => false);
+                        setCardSetupError(() => null);
+                    }
+                } catch (error) {
+                    console.log(error);
+                    elements.getElement(CardElement).update({ disabled: false });
+                    setCardSetupError(() => "Error! Please try again later!");
+                }
+
+            }
         }
     };
 
@@ -175,7 +178,7 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
                             </div>
                         )}
                         <div className="c-Setup-payment-method__Btn">
-                            <button disabled={cardSetupProcessing || cardSetupDisabled} type="button" className={cardSetupProcessing || cardSetupDisabled ? "c-Btn c-Btn--disabled" : "c-Btn"}onClick={(event) => handleSubmit(event)}>
+                            <button disabled={cardSetupProcessing || cardSetupDisabled} type="button" className={cardSetupProcessing || cardSetupDisabled ? "c-Btn c-Btn--disabled" : "c-Btn"} onClick={(event) => handleSubmit(event)}>
                                 {cardSetupProcessing ? (
                                     <>
                                         <span> Processing </span>

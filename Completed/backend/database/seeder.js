@@ -46,15 +46,15 @@ module.exports.seeder = async () => {
                     name: "Standard",
                     price: "9.90",
                     description: "It's now or never, sign up now to waste money!",
-                    stripe_product_id: "",
-                    stripe_price_id: ""
+                    stripe_product_id: "1",
+                    stripe_price_id: "1"
                 },
                 {
                     name: "Premium",
                     price: "15.90",
                     description: "A slightly more expensive plan than standard plan.",
-                    stripe_product_id: "",
-                    stripe_price_id: ""
+                    stripe_product_id: "2",
+                    stripe_price_id: "2"
                 },
             ])
         
