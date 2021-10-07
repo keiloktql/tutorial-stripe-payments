@@ -1,9 +1,13 @@
 const { Accounts } = require("../model_definitions/Accounts");
 const { PaymentMethods } = require("../model_definitions/PaymentMethods");
+const { Subscriptions } = require("../model_definitions/Subscriptions");
 
 module.exports.findAccountByID = (accountID) => Accounts.findByPk(accountID, {
     include: [{
         model: PaymentMethods,
+        as: "payment_accounts"
+    }, {
+        model: Subscriptions,
         as: "payment_accounts"
     }] 
 });
