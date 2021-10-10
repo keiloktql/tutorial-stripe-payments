@@ -1,11 +1,11 @@
-const { Accounts } = require("./src/model_definitions/Accounts");
-const { Accounts_PaymentMethods } = require("./src/model_definitions/Accounts_PaymentMethods");
-const { Billings } = require("./src/model_definitions/Billings");
-const { Passwords } = require("./src/model_definitions/Passwords");
-const { PaymentMethods } = require("./src/model_definitions/PaymentMethods");
-const { Plans } = require("./src/model_definitions/Plans");
-const { Products } = require("./src/model_definitions/Products");
-const { Subscriptions } = require("./src/model_definitions/Subscriptions");
+const { Accounts } = require("./src/schemas/Accounts");
+const { Accounts_PaymentMethods } = require("./src/schemas/Accounts_PaymentMethods");
+const { Billings } = require("./src/schemas/Billings");
+const { Passwords } = require("./src/schemas/Passwords");
+const { PaymentMethods } = require("./src/schemas/PaymentMethods");
+const { Plans } = require("./src/schemas/Plans");
+const { Products } = require("./src/schemas/Products");
+const { Subscriptions } = require("./src/schemas/Subscriptions");
 
 
 const express = require("express");
@@ -38,7 +38,7 @@ app.listen(PORT, (error) => {
 });
 
 // setting this to true will drop all tables and seed new data
-const reset = true;
+const reset = false;
 
 // sync sequelize with sql db
 // immediately invoked function necessary to run await async code

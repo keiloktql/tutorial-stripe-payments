@@ -95,9 +95,8 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
                 // Obtain payment method id
                 const stripePaymentMethodID = result.setupIntent.payment_method;
 
-                // Verify stripePaymentMethod fingerprint doesn't already exist
                 try {
-                    const verifyPaymentMethodDuplicate = await axios.post(`${config.baseUrl}/stripe/verify_payment_method_setup`, {
+                    await axios.post(`${config.baseUrl}/stripe/payment_method`, {
                         stripePaymentMethodID
                     }, {
                         headers: {
@@ -105,22 +104,23 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
                         }
                     });
 
-                    if (verifyPaymentMethodDuplicate.data.duplicate) {
-                        setCardSetupError(() => "Error! Card already exists!");
-                        elements.getElement(CardElement).update({ disabled: false });
-                        setCardSetupProcessing(() => false);
+                    elements.getElement(CardElement).clear();
+                    setRerender((prevState) => !prevState);    // tell parent component to rerender to see changes
+                    setCardSetupSuccess(() => true);
+                    setCardSetupProcessing(() => false);
+                    setCardSetupError(() => null);
 
-                    } else {
-                        elements.getElement(CardElement).clear();
-                        setRerender((prevState) => !prevState);    // tell parent component to rerender to see changes
-                        setCardSetupSuccess(() => true);
-                        setCardSetupProcessing(() => false);
-                        setCardSetupError(() => null);
-                    }
                 } catch (error) {
                     console.log(error);
+                    const duplicate = error.response?.data.duplicate;
+                    if (duplicate) {
+                        setCardSetupError(() => error.response.data.message);
+                    } else {
+                        setCardSetupError(() => "Error! Please try again later!");
+                    }
+
                     elements.getElement(CardElement).update({ disabled: false });
-                    setCardSetupError(() => "Error! Please try again later!");
+
                 }
 
             }
@@ -152,6 +152,7 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
         <form className={showHideClassName} onSubmit={(event) => handleSubmit(event)}>
             {
                 cardSetupSuccess ?
+                    // Card set up success component
                     <div className="c-Setup-payment-method c-Setup-payment-method__Success">
                         <span>
                             <svg viewBox="0 0 24 24">

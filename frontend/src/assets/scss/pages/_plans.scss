@@ -7,11 +7,18 @@
     flex-direction: column;
     min-height: calc(100vh - 60px);
 
-    &__Heading {
-        color: $stripe-text-dark;
-        padding-bottom: 50px;
-        font-weight: bolder;
+    &__Top {
+        .c-Plans {
+            &__Heading {
+                color: $stripe-text-dark;
+                font-weight: bolder;
+            }
+        }
+        p {
+            text-align: center;
+        }
     }
+
     &__Cards {
         display: flex;
         justify-content: center;

@@ -23,3 +23,13 @@ module.exports.createStripeCustomer = (email, username) => stripe.customers.crea
   email,
   name: username
 });
+
+// Detach payment method
+module.exports.detachPaymentMethod = (paymentMethodID) => stripe.paymentMethods.detach(
+  paymentMethodID
+);
+
+// Find payment method
+module.exports.findPaymentMethodFromStripe = (paymentMethodID) => stripe.paymentMethods.retrieve(
+  paymentMethodID
+);

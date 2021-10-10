@@ -94,12 +94,12 @@ Subscriptions.belongsTo(Plans, {
 });
 
 PaymentMethods.hasMany(Subscriptions, {
-    foreignKey: "fk_plan_id",
+    foreignKey: "fk_payment_method",
     as: "subscription"
 });
 
 Subscriptions.belongsTo(PaymentMethods, {
-    foreignKey: "fk_plan_id",
+    foreignKey: "fk_payment_method",
     as: "payment_method"
 });
 

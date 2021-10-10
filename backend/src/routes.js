@@ -29,6 +29,8 @@ module.exports = router => {
     // STRIPE PAYMENT
     router.post("/api/v1/stripe/payment_intents", isLoggedIn, calculateProductsTotalPrice, stripeController.createPaymentIntent);
     router.put("/api/v1/stripe/payment_intents", isLoggedIn, calculateProductsTotalPrice, stripeController.updatePaymentIntent);
+    router.post("/api/v1/stripe/setup_intents", isLoggedIn, stripeController.createSetupIntent);
+    router.post("/api/v1/stripe/verify/setup_payment_methods", isLoggedIn, stripeController.verifyPaymentMethodSetup);
 
     // PRODUCTS
     router.get("/api/v1/products", isLoggedIn, productController.findAllProducts);

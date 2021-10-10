@@ -1,4 +1,4 @@
-const { Products } = require("../model_definitions/Products");
+const { Products } = require("../schemas/Products");
 const { Op } = require("sequelize");
 
 module.exports.findAllProducts = () => Products.findAll();

@@ -3,8 +3,8 @@ const jwt = require("jsonwebtoken");
 const { Op } = require("sequelize");
 
 const { jwt: { secret: jwtSecret } } = require("../config/config");
-const { Accounts } = require("../model_definitions/Accounts");
-const { Passwords } = require("../model_definitions/Passwords");
+const { Accounts } = require("../schemas/Accounts");
+const { Passwords } = require("../schemas/Passwords");
 
 module.exports.clientLogin = async (req, res) => {
     try {

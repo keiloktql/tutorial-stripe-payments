@@ -1,8 +1,8 @@
 // MODELS IMPORT
-const { Accounts } = require("../src/model_definitions/Accounts");
-const { Passwords } = require("../src/model_definitions/Passwords");
-const { Products } = require("../src/model_definitions/Products");
-const { Plans } = require("../src/model_definitions/Plans");
+const { Accounts } = require("../src/schemas/Accounts");
+const { Passwords } = require("../src/schemas/Passwords");
+const { Products } = require("../src/schemas/Products");
+const { Plans } = require("../src/schemas/Plans");
 
 // SERVICES IMPORT
 const { createStripeCustomer } = require("../src/services/stripe");

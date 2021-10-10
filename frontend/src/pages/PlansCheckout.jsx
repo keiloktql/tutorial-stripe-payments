@@ -44,6 +44,7 @@ const PlansCheckout = ({ match }) => {
         history.push("/page-not-found");
     }
 
+    // State Declarations
     const [rerender, setRerender] = useState(false);
     const [showSetupPaymentMethod, setShowSetupPaymentMethod] = useState(false);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
@@ -69,11 +70,35 @@ const PlansCheckout = ({ match }) => {
                     }
                 });
                 const accountData = accountResponse.data;
+                console.log(accountData);
     
                 if (componentMounted) {
                     // Check if user has any payment methods type stored already
+                    if (accountData.account.payment_accounts?.length > 0) {
+                        setPaymentMethods(() => accountData.account.payment_accounts.map((paymentMethod) => ({
+                            cardBrand: paymentMethod.card_type,
+                            last4: paymentMethod.card_last_four_digit,
+                            expDate: paymentMethod.card_exp_date,
+                            stripePaymentMethodID: paymentMethod.payment_method_id
+                        })));
+                    } else {
+                        setPaymentMethods(() => []);
+                    }
 
                     // Check if there is subscription id
+                    if (accountData.account.stripe_subscription_id) {
+                        setSubscriptionID(() => accountData.account.stripe_subscription_id);
+                        setClientSecret(() => accountData.account.stripe_client_secret);
+                    } else {
+                        // const subscription = await axios.post(`${config.baseUrl}/stripe/subscriptions/${match.params.type}`, {}, {
+                        //     headers: {
+                        //         'Authorization': `Bearer ${token}`
+                        //     }
+                        // });
+
+                        // setSubscriptionID(() => subscription.data.subscriptionID);
+                        // setClientSecret(() => subscription.data.clientSecret);
+                    }
                     
                 }
             } catch (error) {

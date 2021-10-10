@@ -1,6 +1,6 @@
-const { Accounts } = require("../model_definitions/Accounts");
-const { PaymentMethods } = require("../model_definitions/PaymentMethods");
-const { Subscriptions } = require("../model_definitions/Subscriptions");
+const { Accounts } = require("../schemas/Accounts");
+const { PaymentMethods } = require("../schemas/PaymentMethods");
+const { Subscriptions } = require("../schemas/Subscriptions");
 
 module.exports.findAccountByID = (accountID) => Accounts.findByPk(accountID, {
     include: [{
@@ -8,7 +8,7 @@ module.exports.findAccountByID = (accountID) => Accounts.findByPk(accountID, {
         as: "payment_accounts"
     }, {
         model: Subscriptions,
-        as: "payment_accounts"
+        as: "subscription"
     }] 
 });
 

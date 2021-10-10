@@ -3,15 +3,30 @@ footer {
     background-color: $stripe-primary;
     color: white;
     padding: 20px 0;
+
     .c-Footer {
         width: 55%;
         margin: auto;
+
         .c-Top {
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
+            a {
+                font-weight: bold;
+                color: white;
+
+                &:hover {
+                    opacity: 0.8;
+                }
+
+                &:active {
+                    opacity: 0.7;
+                }
+            }
         }
+
         hr {
             margin: 20px 0;
             background-color: white;
@@ -20,17 +35,25 @@ footer {
         }
 
         .c-Bottom {
-            text-align: center;
-            a {
-                font-weight: bold;
-                color: white;
-                &:hover {
-                    opacity: 0.8;
-                }
-                &:active {
-                    opacity: 0.7;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            &__Left {
+                display: flex;
+                flex-direction: row;
+
+            }
+
+            &__Right {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                .c-Btn__Globe {
+                    padding-right: 10px;
                 }
             }
+
         }
     }
 }
