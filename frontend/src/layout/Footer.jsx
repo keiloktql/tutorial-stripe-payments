@@ -1,6 +1,5 @@
 import React from 'react';
-import * as BiIcons from 'react-icons/bi';
-import { IconContext } from 'react-icons';
+import flagSG from '../assets/images/flag-sg.png';
 
 const Footer = () => {
     return (
@@ -20,9 +19,7 @@ const Footer = () => {
                     </div>
                     <div className="c-Bottom__Right">
                         <p>
-                            <IconContext.Provider value={{ color: "#ffffff", size: "30px" }}>
-                                <BiIcons.BiWorld className="c-Btn__Globe" />
-                            </IconContext.Provider>
+                            <img src = {flagSG} alt = "SG" />
                             Singapore
                         </p>
                     </div>

@@ -8,10 +8,11 @@ const { Plans } = require("./Plans");
 const Subscriptions = db.define(
     "Subscriptions",
     {
+        // Using stripe's subscription id
         stripe_subscription_id: {
-            type: DataTypes.INTEGER.UNSIGNED,
+            type: DataTypes.STRING(255),
             primaryKey: true,
-            autoIncrement: true
+            autoIncrement: false
         },
         fk_plan_id: {
             type: DataTypes.INTEGER.UNSIGNED,
@@ -60,16 +61,17 @@ const Subscriptions = db.define(
             type: DataTypes.STRING(255),
             allowNull: true,
         },
-        
-        // to add start date here too and subscription status
+        start_date: {
+            // Timestamp when user successfully paid for subscription for the first time
+            type: "TIMESTAMP",
+            allowNull: true
+        }
     },
     {
         tableName: "subscriptions",
         timestamps: true,
         createdAt: "created_at",
-        updatedAt: "updated_at",
-        paranoid: true,
-        deletedAt: "deleted_at"
+        updatedAt: "updated_at"
     }
 );
 

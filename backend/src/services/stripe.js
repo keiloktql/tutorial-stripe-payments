@@ -33,3 +33,30 @@ module.exports.detachPaymentMethod = (paymentMethodID) => stripe.paymentMethods.
 module.exports.findPaymentMethodFromStripe = (paymentMethodID) => stripe.paymentMethods.retrieve(
   paymentMethodID
 );
+
+// Create setup intent
+module.exports.createSetupIntent = (customerID) => stripe.setupIntents.create({
+  customer: customerID,
+});
+
+// Create subscription
+module.exports.createSubscriptionInStripe = (stripeCustomerID, stripeSubscriptionPriceID, email) => stripe.paymentIntents.create({
+  customer: stripeCustomerID,
+  items: [{
+    price: stripeSubscriptionPriceID
+  }],
+  payment_behavior: 'default_incomplete',
+  expand: ['latest_invoice.payment_intent'],
+  receipt_email: email
+});
+
+// Update subscription
+module.exports.updateSubscriptionInStripe = (stripeSubscriptionID, stripeSubscriptionPriceID) => stripe.paymentIntents.update({
+  customer: stripeCustomerID,
+  items: [{
+    price: stripeSubscriptionPriceID
+  }],
+  payment_behavior: 'default_incomplete',
+  expand: ['latest_invoice.payment_intent'],
+  receipt_email: email
+});

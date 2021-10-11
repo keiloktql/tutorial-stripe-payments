@@ -56,12 +56,12 @@ const Billings = db.define(
 );
 
 Subscriptions.hasMany(Billings, {
-    foreignKey: "fk_subscription_id",
+    foreignKey: "fk_stripe_subscription_id",
     as: "billing"
 });
 
 Billings.belongsTo(Subscriptions, {
-    foreignKey: "fk_subscription_id",
+    foreignKey: "fk_stripe_subscription_id",
     as: "subscription"
 });
 

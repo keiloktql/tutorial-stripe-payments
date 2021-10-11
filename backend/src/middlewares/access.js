@@ -1,5 +1,6 @@
 const config = require("../config/config");
 
+// Check whether webhook request is from Stripe
 module.exports.verifyStripeWebhookRequest = async (req, res, next) => {
     try {
         const event = req.body;
@@ -28,3 +29,12 @@ module.exports.verifyStripeWebhookRequest = async (req, res, next) => {
         return res.status(500).send();
     }
 };
+
+// Check whether to allow access to content exclusive to subscribers
+// (for reference) Plan types: Normal (no plan), Standard, Premium
+//
+// NOTE: Admin level does not affect access
+//
+// tier -> 0 = All users
+//         1 = Standard and Premium Users only
+//         2 = Premium Users only

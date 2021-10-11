@@ -27,10 +27,27 @@ module.exports = router => {
     router.post("/api/v1/account", accountController.createAccount);
 
     // STRIPE PAYMENT
+
+    // Create payment intent
     router.post("/api/v1/stripe/payment_intents", isLoggedIn, calculateProductsTotalPrice, stripeController.createPaymentIntent);
+
+    // Update payment intent
     router.put("/api/v1/stripe/payment_intents", isLoggedIn, calculateProductsTotalPrice, stripeController.updatePaymentIntent);
+
+    // Create setup intent
     router.post("/api/v1/stripe/setup_intents", isLoggedIn, stripeController.createSetupIntent);
-    router.post("/api/v1/stripe/verify/setup_payment_methods", isLoggedIn, stripeController.verifyPaymentMethodSetup);
+
+    // Create payment method
+    router.post("/api/v1/stripe/payment_methods", isLoggedIn, stripeController.createPaymentMethod);
+
+    // Create Subscription
+    router.post("/api/v1/stripe/subscriptions/:type", isLoggedIn, stripeController.createSubscription);
+
+    // Update Subscription
+    router.put("/api/v1/stripe/subscriptions/:type", isLoggedIn, stripeController.updateSubscription);
+
+    // Cancel Subscription
+    
 
     // PRODUCTS
     router.get("/api/v1/products", isLoggedIn, productController.findAllProducts);
