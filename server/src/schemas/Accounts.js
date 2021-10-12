@@ -19,6 +19,11 @@ const Accounts = db.define(
             allowNull: false,
             unique: true
         },
+        trialed: {
+            // Tracks whether account has free trialed the system before
+            type: DataTypes.BOOLEAN,
+            allowNull: false
+        },
         // Stripe
         stripe_customer_id: {
             type: DataTypes.STRING(255),

@@ -43,11 +43,14 @@ module.exports = router => {
     // Create Subscription
     router.post("/api/v1/stripe/subscriptions/:type", isLoggedIn, stripeController.createSubscription);
 
-    // Update Subscription
-    router.put("/api/v1/stripe/subscriptions/:type", isLoggedIn, stripeController.updateSubscription);
+    // Update Subscription Plan
+    router.put("/api/v1/stripe/subscriptions/:type", isLoggedIn, stripeController.updateSubscriptionPlan);
+    
+    // Update Subscription Default Payment Method
+    router.put("/api/v1/stripe/subscriptions", isLoggedIn, stripeController.updateSubscriptionPaymentMethod);
 
     // Cancel Subscription
-    
+    router.delete("/api/v1/stripe/subscriptions", isLoggedIn, stripeController.cancelSubscription);
 
     // PRODUCTS
     router.get("/api/v1/products", isLoggedIn, productController.findAllProducts);

@@ -24,6 +24,7 @@ module.exports.seeder = async () => {
             await Accounts.create({
                 username,
                 email,
+                trialed: false,
                 passwords: [{
                     password: bcrypt.hashSync("123", 10)
                 }],

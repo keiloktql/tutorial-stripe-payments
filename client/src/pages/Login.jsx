@@ -23,6 +23,7 @@ const Login = () => {
         let componentMounted = true;
 
         if (componentMounted) {
+            // Hardcoded empty field validation, should use libraries like formik and yup
             if (inputValues.usernameOrEmail !== "" && inputValues.password !== "") {
                 setLoginDisabled(() => false);
             } else {
@@ -51,9 +52,7 @@ const Login = () => {
             console.log(loginResponse);
             const loginData = loginResponse.data;
             saveUserToken(loginData.token);
-            setTimeout(() => {
-                history.push("/home");
-            }, 5000);
+            history.push("/home");
 
         } catch (error) {
             console.log(error);

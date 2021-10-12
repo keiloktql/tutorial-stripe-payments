@@ -57,12 +57,21 @@ const Subscriptions = db.define(
             type: DataTypes.ENUM(["active", "past_due", "unpaid", "canceled", "incomplete", "incomplete_expired", "trialing"]),
             allowNull: true
         },
-        stripe_next_billing_date: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
+        current_period_start: {
+            type: "TIMESTAMP",
+            allowNull: true
+        },
+        current_period_end: {
+            type: "TIMESTAMP",
+            allowNull: true
         },
         start_date: {
-            // Timestamp when user successfully paid for subscription for the first time
+            // Timestamp when user starts subscription (includes free trial)
+            type: "TIMESTAMP",
+            allowNull: true
+        },
+        end_date: {
+            // Timestamp when subscription is cancelled
             type: "TIMESTAMP",
             allowNull: true
         }

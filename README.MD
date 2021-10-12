@@ -1,13 +1,55 @@
-# Repo for 'Stripe with React & NodeJS' guide. 
+# Repo for 'Stripe with React & NodeJS' guide.
 
 This system is a simple user management system with subscription plans and one time payment.
 
 # Project Set Up
 
-*Coming soon*
+_not ready_
 
 ## Stripe
 
-## Frontend
+- Ensure account has been set up
 
-## Backend
+## Client
+
+- Run `npm i` to install the necessary dependencies
+- Create a new `.env` file and paste this inside and **make any necessary changes**:
+- `REACT_APP_BASEURL_STRIPE_PK_TEST` api key can be obtained from https://dashboard.stripe.com/test/apikeys
+
+  ```
+  REACT_APP_BASEURL=http://localhost:4242/api/v1
+  REACT_APP_BASEURL_STRIPE_PK_TEST=
+  ```
+
+## Server
+
+- Run `npm i` to install the necessary dependencies
+- Run the SQL init file located in `database/init.sql`
+- Create a new `.env` file and paste this inside and **make any necessary changes**:
+- `REACT_APP_BASEURL_STRIPE_PK_TEST` api key can be obtained from https://dashboard.stripe.com/test/apikeys
+- `STRIPE_TEST_WEBHOOK_SECRET` can be found in your webhook settings in the Developer Dashboard (only exists after your webhooks have been set up)
+
+  ```
+  PORT=4242
+  DB_HOST=localhost
+  DB_NAME=deluxe
+  DB_PORT=3306
+  DB_USER=root
+  DB_PASSWORD=
+
+  JWT_SECRET=
+
+  STRIPE_TEST_SK=
+  STRIPE_TEST_WEBHOOK_SECRET=
+  ```
+### Seeding Data
+
+- This step is required when starting the application for the first time
+- To seed data, ensure that in `index.js` line 41,
+
+```Javascript
+const reset = true;
+```
+
+- Next, start the server
+- Upon completion of the seeding process, set reset to false to prevent table drop and seeding of new data when starting the server again
