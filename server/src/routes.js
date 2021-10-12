@@ -8,6 +8,7 @@ const productController = require("./controllers/product");
 const { isLoggedIn } = require("./middlewares/login");
 const { calculateProductsTotalPrice } = require("./middlewares/payment");
 const { verifyStripeWebhookRequest } = require("./middlewares/access");
+const { checkIfPlanExist } = require("./middlewares/subscription");
 
 module.exports = router => {
 
@@ -41,10 +42,10 @@ module.exports = router => {
     router.post("/api/v1/stripe/payment_methods", isLoggedIn, stripeController.createPaymentMethod);
 
     // Create Subscription
-    router.post("/api/v1/stripe/subscriptions/:type", isLoggedIn, stripeController.createSubscription);
+    router.post("/api/v1/stripe/subscriptions/:type", isLoggedIn, checkIfPlanExist, stripeController.createSubscription);
 
     // Update Subscription Plan
-    router.put("/api/v1/stripe/subscriptions/:type", isLoggedIn, stripeController.updateSubscriptionPlan);
+    router.put("/api/v1/stripe/subscriptions/:type", isLoggedIn, checkIfPlanExist, stripeController.updateSubscriptionPlan);
     
     // Update Subscription Default Payment Method
     router.put("/api/v1/stripe/subscriptions", isLoggedIn, stripeController.updateSubscriptionPaymentMethod);

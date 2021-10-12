@@ -22,8 +22,8 @@ module.exports.createAccount = (username, email, password, stripeCustomerID) => 
     stripe_customer_id: stripeCustomerID
 });
 
-module.exports.updateAccountByID = (accountID, content) => Accounts.update({
-    ...content
+module.exports.updateAccountByID = (accountID, meta) => Accounts.update({
+    ...meta
 }, {
     where: {
         account_id: accountID

@@ -41,6 +41,19 @@ const Subscriptions = db.define(
             allowNull: true,
             unique: true
         },
+        stripe_schedule_id: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+            unique: true
+        },
+        fk_change_plan_id: {
+            type: DataTypes.INTEGER.UNSIGNED,
+            allowNull: true,
+            references: {
+                model: Plans,
+                key: "plan_id"
+            }
+        },
         fk_payment_method: {
             type: DataTypes.STRING(255),
             allowNull: true,
@@ -54,7 +67,7 @@ const Subscriptions = db.define(
             allowNull: true
         },
         stripe_status: {
-            type: DataTypes.ENUM(["active", "past_due", "unpaid", "canceled", "incomplete", "incomplete_expired", "trialing"]),
+            type: DataTypes.ENUM(["active", "canceled", "incomplete", "trialing", "past_due"]),
             allowNull: true
         },
         current_period_start: {
@@ -102,6 +115,16 @@ Plans.hasMany(Subscriptions, {
 Subscriptions.belongsTo(Plans, {
     foreignKey: "fk_plan_id",
     as: "plan"
+});
+
+Plans.hasMany(Subscriptions, {
+    foreignKey: "fk_change_plan_id",
+    as: "subscription"
+});
+
+Subscriptions.belongsTo(Plans, {
+    foreignKey: "fk_change_plan_id",
+    as: "change_plan"
 });
 
 PaymentMethods.hasMany(Subscriptions, {

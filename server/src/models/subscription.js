@@ -1,6 +1,6 @@
 const { Op } = require("sequelize");
 
-const { Accounts } = require("../schemas/Accounts");
+const { Plans } = require("../schemas/Plans");
 const { Subscriptions } = require("../schemas/Subscriptions");
 
 // Create Subscription
@@ -44,12 +44,18 @@ module.exports.deleteSubscription = (subscriptionID) => Subscriptions.destroy({
     }
 })
 
-// Find active subscritions
+// Find active subscriptions
+// Active means subscription status aka stripe_status can be: 
+// 'incomplete', 'active', 'trialing', 'past_due'
 module.exports.findActiveSubscription = (accountID) => Subscriptions.findOne({
     where: {
         fk_account_id: accountID,
         stripe_status: {
             [Op.ne]: "canceled"
         }
-    }
+    },
+    include: [{
+        model: Plans,
+        as: "plan"
+    }] 
 });

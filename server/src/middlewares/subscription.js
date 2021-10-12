@@ -6,9 +6,7 @@ module.exports.checkIfPlanExist = async (req, res, next) => {
 
         const { type } = req.params;
 
-        if (!type) return res.status(400).json({
-            message: "Invalid parameter \"type\""
-        });
+        if (!type) return next();
 
         // Check if plan exists
         const plan = await findPlan(type);

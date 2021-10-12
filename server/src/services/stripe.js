@@ -24,6 +24,12 @@ module.exports.createStripeCustomer = (email, username) => stripe.customers.crea
   name: username
 });
 
+// Update customer
+module.exports.updateStripeCustomer = (customerID, meta) => stripe.customers.update(
+  customerID,
+  meta
+);
+
 // Detach payment method
 module.exports.detachPaymentMethod = (paymentMethodID) => stripe.paymentMethods.detach(
   paymentMethodID
@@ -40,10 +46,10 @@ module.exports.createSetupIntent = (customerID) => stripe.setupIntents.create({
 });
 
 // Create subscription
-module.exports.createSubscriptionInStripe = (stripeCustomerID, stripeSubscriptionPriceID, email) => stripe.subscriptions.create({
-  customer: stripeCustomerID,
+module.exports.createSubscriptionInStripe = (customerID, subscriptionPriceID, email) => stripe.subscriptions.create({
+  customer: customerID,
   items: [{
-    price: stripeSubscriptionPriceID
+    price: subscriptionPriceID
   }],
   payment_behavior: 'default_incomplete',
   expand: ['latest_invoice.payment_intent'],
@@ -51,22 +57,29 @@ module.exports.createSubscriptionInStripe = (stripeCustomerID, stripeSubscriptio
 });
 
 // Update subscription plan
-module.exports.updateSubscriptionPlanInStripe = (stripeSubscriptionID, stripeSubscriptionPriceID) => stripe.subscriptions.update(
-  stripeSubscriptionID,
+module.exports.updateSubscriptionPlanInStripe = (subscriptionID, subscriptionPriceID) => stripe.subscriptions.update(
+  subscriptionID,
   {
     items: [{
-      price: stripeSubscriptionPriceID
+      price: subscriptionPriceID
     }],
-  }
+    proration_behavior: none
+  },
 );
 
 // Update subscription payment method
-module.exports.updateSubscriptionPaymentMethodInStripe = (stripeSubscriptionID, stripeSubscriptionPriceID) => stripe.subscriptions.update(
-  stripeSubscriptionID,
+module.exports.updateSubscriptionPaymentMethodInStripe = (subscriptionID, paymentMethodID) => stripe.subscriptions.update(
+  subscriptionID,
   {
-    default_payment_method: [{
-      price: stripeSubscriptionPriceID
-    }],
+    default_payment_method: paymentMethodID
+  }
+);
+
+// Update subscription email
+module.exports.updateSubscriptionEmailInStripe = (subscriptionID, email) => stripe.subscriptions.update(
+  subscriptionID,
+  {
+    receipt_email: email  // invoice email will be sent to this email automatically
   }
 );
 
