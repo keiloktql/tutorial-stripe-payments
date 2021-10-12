@@ -1,9 +1,9 @@
 import React from 'react';
 import { ToastContainer } from "react-toastify";
 
-import Title from '../layout/Title';
-import Header from "../layout/Header";
-import Footer from "../layout/Footer";
+import Title from './Title';
+import Header from "./Header";
+import Footer from "./Footer";
 import config from "../config/config";
 
 const PageLayout = ({ title, children }) => {
