@@ -6,7 +6,7 @@ import { clearLocalStorage, getToken } from "../utilities/localStorageUtils";
 import axios from "axios";
 import config from "../config/config";
 import jwt_decode from "jwt-decode";
-import Tooltip from "@material-ui/core/Tooltip";
+import Tooltip from '@mui/material/Tooltip';
 import useComponentVisible from "../hooks/useComponentVisible";
 
 const Header = () => {

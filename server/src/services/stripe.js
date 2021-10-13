@@ -42,7 +42,10 @@ module.exports.findPaymentMethodFromStripe = (paymentMethodID) => stripe.payment
 
 // Find payment intent
 module.exports.findPaymentIntent = (paymentIntentID) => stripe.paymentIntents.retrieve(
-  paymentIntentID
+  paymentIntentID,
+  {
+    expand: ['payment_method'],
+  }
 );
 
 // Create setup intent
@@ -51,7 +54,8 @@ module.exports.createSetupIntent = (customerID) => stripe.setupIntents.create({
 });
 
 // Create subscription
-module.exports.createSubscriptionInStripe = (customerID, subscriptionPriceID, email) => stripe.subscriptions.create({
+module.exports.createSubscriptionInStripe = (customerID, subscriptionPriceID, email, meta) => stripe.subscriptions.create({
+  ...meta,
   customer: customerID,
   items: [{
     price: subscriptionPriceID
@@ -81,6 +85,6 @@ module.exports.cancelSubscription = (stripeSubscriptionID) => stripe.subscriptio
 );
 
 // Find invoice
-module.exports.findInvoiceInStripe = (latestInvoiceID) => await stripe.invoices.retrieve(
+module.exports.findInvoiceInStripe = (latestInvoiceID) => stripe.invoices.retrieve(
   latestInvoiceID
 );

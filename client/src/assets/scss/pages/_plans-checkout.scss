@@ -1,13 +1,13 @@
 .c-Plans-checkout {
   display: flex;
   align-items: center;
+  justify-content: center;
   width: 75%;
   margin: auto;
   min-height: calc(100vh - 60px);
   flex-direction: column;
 
   &__Heading {
-      padding-top: 100px;
       padding-bottom: 20px;
       text-align: center;
       h1 {

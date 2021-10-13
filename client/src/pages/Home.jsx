@@ -7,6 +7,7 @@ import ProductCard from "../common/ProductCard";
 import { NavLink } from "react-router-dom";
 import CreditCard from "../common/CreditCard";
 import PageLayout from "../layout/PageLayout";
+import HomeBentoBox from "../common/HomeBentoBox";
 
 const Home = () => {
 
@@ -20,6 +21,11 @@ const Home = () => {
     description: null,
     price: null,
     imageLink: null
+  });
+  const [exclusiveContent, setExclusiveContent] = useState({
+    all: null,
+    standard: null,
+    premium: null
   });
 
   useEffect(() => {
@@ -84,6 +90,35 @@ const Home = () => {
             <h1>Add Credit Card Demo</h1>
             <NavLink to="/account" >Go to Account</NavLink>
             <CreditCard last4="4242" expDate="12/24" />
+          </div>
+
+          {/* Subscription visibility demo */}
+          <div className="c-Home__Subscription">
+            <h1>Test your subscription here</h1>
+            <p>The higher your subscription level, the more content you will be able to see</p>
+            <NavLink to="/account" >Manage Subscription</NavLink>
+            <div className="c-Home__Subscription-legend c-Subscription-legend">
+              <h2>Visibility</h2>
+              <ul>
+                <li>
+                  <span className="c-Subscription-legend__All"></span>
+                  <p>All Users</p>
+                </li>
+                <li>
+                  <span className="c-Subscription-legend__Standard"></span>
+                  <p>Standard, Premium and Free Trial Users only</p>
+                </li>
+                <li>
+                  <span className="c-Subscription-legend__Premium"></span>
+                  <p>Premium and Free trial users only</p>
+                </li>
+              </ul>
+            </div>
+            <div className="c-Home__Bento-boxes">
+              <HomeBentoBox content={exclusiveContent.all} heading="All users" variation={1} />
+              <HomeBentoBox content={exclusiveContent.standard} variation={2} />
+              <HomeBentoBox content={exclusiveContent.premium} variation={3} />
+            </div>
           </div>
 
         </div>

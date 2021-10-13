@@ -1,0 +1,32 @@
+.c-Home-bento-box {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 30px;
+    border-radius: 5px;
+    padding: 15px;
+    max-width: 300px;
+    width: 100%;
+    min-width: 300px;
+
+    &--var {
+        &-1 {
+            background-color: rgb(181, 164, 245);
+        }
+
+        &-2 {
+            background-color: rgb(233, 184, 139);
+        }
+
+        &-3 {
+            background-color: rgb(209, 247, 202);
+        }
+    }
+
+
+    h1 {
+        font-weight: bold;
+        color: $stripe-primary;
+        font-size: $font-medium;
+    }
+}

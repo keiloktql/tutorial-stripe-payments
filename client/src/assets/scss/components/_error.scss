@@ -1,0 +1,27 @@
+.c-Error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    h1 {
+        
+    }
+    p {
+
+    }
+
+    a {
+        color: $stripe-purple;
+        font-size: $font-small;
+        font-weight: 600;
+
+        &:hover {
+            opacity: 0.8;
+        }
+
+        &:active {
+            opacity: 0.7;
+        }
+    }
+}

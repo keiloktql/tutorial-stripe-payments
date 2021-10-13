@@ -8,21 +8,21 @@ const { Accounts } = require("../schemas/Accounts");
 module.exports.insertPaymentMethod = async (accountID, paymentMethodID, cardFingerprint, cardLastFourDigit, cardType, cardExpDate) => {
 
     await PaymentMethods.create({
-        payment_method_id: paymentMethodID,
-        payment_method_fingerprint: cardFingerprint,
-        card_last_four_digit: cardLastFourDigit,
-        card_type: cardType,
-        card_exp_date: cardExpDate,
+        stripe_payment_method_id: paymentMethodID,
+        stripe_payment_method_fingerprint: cardFingerprint,
+        stripe_card_last_four_digit: cardLastFourDigit,
+        stripe_card_type: cardType,
+        stripe_card_exp_date: cardExpDate,
     });
 
     try {
         await Accounts_PaymentMethods.create({
            fk_account_id: accountID,
-           fk_payment_method_id: paymentMethodID
+           fk_payment_methods_id: paymentMethodID
         });
     } catch (e) {
         console.log(e);
-        PaymentMethods.destroy({
+        await PaymentMethods.destroy({
             where: {
                 fk_account_id: accountID
             }

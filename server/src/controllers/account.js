@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 
 const { findAccountByID, createAccount, updateAccountByID } = require('../models/account');
+const { findLiveSubscription } = require("../models/subscription");
 const { createStripeCustomer, updateStripeCustomer } = require('../services/stripe');
 
 // Get account by ID
@@ -18,8 +19,11 @@ module.exports.findAccountByID = async (req, res) => {
             message: `\"accountID\" ${accountID} not found`
         });
 
+        const liveSubscription = await findLiveSubscription(accountID);
+
         return res.status(200).send({
-            account
+            account,
+            liveSubscription
         });
 
     } catch (error) {
@@ -35,16 +39,20 @@ module.exports.createAccount = async (req, res) => {
 
         // Didn't do output sanitization, validation checks
 
+        // Didn't checked whether email and username already exists
+
         if (!email || !username || !password) return res.status(400).json({
             message: `Missing fields`
         });
 
         // Create account in stripe
-        const customer = createStripeCustomer(email, username);
+        const customer = await createStripeCustomer(email, username);
         const stripeCustomerID = customer.id;
 
         // Create account in our database
         await createAccount(username, email, bcrypt.hashSync(password, 10), stripeCustomerID);
+
+        return res.status(200).send();
 
     } catch (error) {
         console.log(error);

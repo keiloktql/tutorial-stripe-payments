@@ -4,8 +4,10 @@ import { NavLink, useHistory } from "react-router-dom";
 import config from "../config/config";
 import PageLayout from "../layout/PageLayout";
 import Loading from "../common/Loading";
+import { toast } from "react-toastify";
 
 const SignUp = () => {
+    const history = useHistory();
     // State declaration
     const [inputValues, setInputValues] = useState({
         email: "",
@@ -40,12 +42,41 @@ const SignUp = () => {
         }));
     };
 
-    const handleFormSubmit = (event) => {
+    const handleFormSubmit = async (event) => {
         event.preventDefault();
         if (loading) {
             return;
         }
+        
         setLoading(() => true);
+
+        try {
+            await axios.post(`${config.baseUrl}/account`, {
+                email: inputValues.email,
+                username: inputValues.username,
+                password: inputValues.password
+            }, {});
+            setTimeout(() => {
+                toast.success(<>Success!<br />Message: <b>Account has been created!</b></>);
+            }, 0);
+            history.push('/login');
+        } catch (error) {
+            let errCode = "Error!";
+            let errMsg = "Error!";
+            if (error.response !== undefined) {
+                errCode = error.response.status;
+                errMsg = error.response.data.message;
+            }
+            toast.error(
+                <>
+                    Error Code: <b>{errCode}</b>
+                    <br />
+                    Message: <b>{errMsg}</b>
+                </>
+            );
+            setLoading(() => false);
+        }
+
     };
 
     return (

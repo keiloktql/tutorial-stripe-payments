@@ -21,14 +21,17 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
         (async () => {
             try {
                 if (componentMounted) {
-                    // Retrieve client secret here
-                    const setupIntent = await axios.post(`${config.baseUrl}/stripe/setup_intents`, {}, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    setClientSecret(() => setupIntent.data.clientSecret);
-                    setSetupIntentID(() => setupIntent.data.paymentIntentID);
+                    if (show) {
+                        // Retrieve client secret here
+                        const setupIntent = await axios.post(`${config.baseUrl}/stripe/setup_intents`, {}, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        console.log(setupIntent);
+                        setClientSecret(() => setupIntent.data.clientSecret);
+                        setSetupIntentID(() => setupIntent.data.setupIntentID);
+                    }
                 }
             } catch (error) {
                 console.log(error);
@@ -93,11 +96,11 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
                 // card to a Customer
 
                 // Obtain payment method id
-                const stripePaymentMethodID = result.setupIntent.payment_method;
+                const paymentMethodID = result.setupIntent.payment_method;
 
                 try {
-                    await axios.post(`${config.baseUrl}/stripe/payment_method`, {
-                        stripePaymentMethodID
+                    await axios.post(`${config.baseUrl}/stripe/payment_methods`, {
+                        paymentMethodID
                     }, {
                         headers: {
                             'Authorization': `Bearer ${token}`
@@ -118,6 +121,7 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
                     } else {
                         setCardSetupError(() => "Error! Please try again later!");
                     }
+                    setCardSetupProcessing(() => false);
 
                     elements.getElement(CardElement).update({ disabled: false });
 
@@ -160,7 +164,7 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
                             </svg>
                         </span>
                         <h1>Card Added Successfully!</h1>
-                        <button type="button" className="c-Btn c-Btn--link" onClick={() => handleBtn()}>Close</button>
+                        <button type="button" className="c-Btn c-Btn--stripe-purple-empty" onClick={() => handleBtn()}>Close</button>
                     </div>
                     :
 

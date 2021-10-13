@@ -13,6 +13,7 @@ import amexSVG from "../assets/svg/Amex.svg";
 import { ReactSVG } from 'react-svg';
 import SetupPaymentMethod from '../common/SetupPaymentMethod';
 import PageLayout from '../layout/PageLayout';
+import Chip from '@mui/material/Chip';
 
 const Account = () => {
 
@@ -33,7 +34,7 @@ const Account = () => {
     });
     const [loading, setLoading] = useState(true);
     const [editMode, setEditMode] = useState(false);
-    const [paymentHistory, setPaymentHistory] = useState([]);
+    const [billingHistory, setBillingHistory] = useState([]);
     const [paymentMethods, setPaymentMethods] = useState([]);
     const [showSetupPaymentMethod, setShowSetupPaymentMethod] = useState(false);
     const [rerender, setRerender] = useState(false);
@@ -69,9 +70,8 @@ const Account = () => {
                         })));
 
                     }
-                    setTimeout(() => {
-                        setLoading(() => false);
-                    }, 300);
+
+                    setLoading(() => false);
                 }
 
             } catch (error) {
@@ -199,6 +199,27 @@ const Account = () => {
         }
     ];
 
+    const renderCardLogo = (cardType) => {
+        if (cardType === "visa") {
+            return <ReactSVG
+                src={visaSVG}
+                className="c-Payment-history__SVG c-SVG__Visa"
+            />
+        } else if (cardType === "mastercard") {
+            return <ReactSVG
+                src={MCSVG}
+                className="c-Payment-history__SVG c-SVG__Master"
+            />
+        } else if (cardType === "amex") {
+            return <ReactSVG
+                src={amexSVG}
+                className="c-Payment-history__SVG c-SVG__Amex"
+            />
+        } else {
+            return cardType;
+        }
+    };
+
     const handleShowPaymentMethod = () => {
         setShowSetupPaymentMethod((prevState) => !prevState);
     };
@@ -211,78 +232,116 @@ const Account = () => {
         <>
             <SetupPaymentMethod show={showSetupPaymentMethod} handleClose={handleShowPaymentMethod} setRerender={setRerender} />
             <PageLayout>
-            <div className="c-Account">
-                {/* Profile */}
-                <div className="c-Account__Profile">
-                    <div className="c-Account__Heading">
-                        <h1>Profile</h1>
-                        <div className="c-Heading__Btn">
-                            <button type="button" className="c-Btn">Edit</button>
+                <div className="c-Account">
+                    {/* Profile */}
+                    <div className="c-Account__Profile">
+                        <div className="c-Account__Heading">
+                            <div className="c-Heading__Text">
+                                <h1>Profile</h1>
+                                <p>Edit account not available.</p>
+                            </div>
+                            <div className="c-Heading__Btn">
+                                <button type="button" className="c-Btn">Edit</button>
+                            </div>
+                        </div>
+                        <hr />
+                        <div className="c-Profile__Details">
+                            <div className="c-Profile__Labels">
+                                <label htmlFor="email">Email</label>
+                                <label htmlFor="username">Username</label>
+                            </div>
+                            <div className="c-Profile__Info">
+                                <p>{profileData.email || "Error"}</p>
+                                <p>{profileData.username || "Error"}</p>
+                            </div>
                         </div>
                     </div>
-                    <hr />
-                    <div className="c-Profile__Details">
-                        <div className="c-Profile__Labels">
-                            <label htmlFor="email">Email</label>
-                            <label htmlFor="username">Username</label>
+                    {/* Payment methods */}
+                    <div className="c-Account__Payment-method">
+                        <div className="c-Account__Heading">
+                            <div className="c-Heading__Text">
+                                <h1>Payment Methods</h1>
+                                <p>Add credit card demo.</p>
+                            </div>
+                            <div className="c-Heading__Btn">
+                                <button type="button" className="c-Btn" onClick={handleShowPaymentMethod}>Add</button>
+                            </div>
                         </div>
-                        <div className="c-Profile__Info">
-                            <p>{profileData.email || "Error"}</p>
-                            <p>{profileData.username || "Error"}</p>
-                        </div>
-                    </div>
-                </div>
-                {/* Payment methods */}
-                <div className="c-Account__Payment-method">
-                    <div className="c-Account__Heading">
-                        <div className="c-Heading__Text">
-                            <h1>Payment Methods</h1>
-                            <p>Add credit card demo.</p>
-                        </div>
-                        <div className="c-Heading__Btn">
-                            <button type="button" className="c-Btn" onClick={handleShowPaymentMethod}>Add</button>
-                        </div>
-                    </div>
-                    <hr />
-                    {
-                        paymentMethods.length === 0 ?
-                            <p>No Payment Methods Found!</p>
-                            :
-                            <>
-                                {/* Payment method table */}
+                        <hr />
+                        {
+                            paymentMethods.length === 0 ?
+                                <p>No Payment Methods Found!</p>
+                                :
+                                <>
+                                    {/* Payment method table */}
 
-                                <div className="c-Account__Payment-method-table">
-                                    <BootstrapTable
-                                        bordered={false}
-                                        keyField="paymentMethodID"
-                                        data={paymentMethods}
-                                        columns={paymentMethodsColumn}
-                                    />
+                                    <div className="c-Account__Payment-method-table">
+                                        <BootstrapTable
+                                            bordered={false}
+                                            keyField="serialNo"
+                                            data={paymentMethods}
+                                            columns={paymentMethodsColumn}
+                                        />
+                                    </div>
+                                </>
+                        }
+
+                    </div>
+                    {/* Payment history */}
+                    <div className="c-Account__Payment-history">
+                        <div className="c-Account__Heading">
+                            <div className="c-Heading__Text">
+                                <h1>Payment History</h1>
+                                <p>This demo does not contain payment history feature.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Subscription */}
+                    <div className="c-Account__Subscription c-Subscription">
+                        <div className="c-Account__Heading">
+                            <div className="c-Heading__Text">
+                                <h1>Subscription</h1>
+                            </div>
+                        </div>
+                        <hr />
+                        <div className="l-Subscription__Info">
+                            <h2>Current Billing Cycle: 1st July - 30th July</h2>
+                            <div className="c-Subscription__Info c-Info">
+                                <div className="c-Info__Card">
+                                    <h2>Current Plan</h2>
+                                    <h3>Standard</h3>
+                                    <p>S$9.90 per month</p>
+                                    <Chip className = "c-Info__Card-chip" label="Active" color="warning" />
                                 </div>
-                            </>
-                    }
-
-                </div>
-                {/* Payment history */}
-                <div className="c-Account__Payment-history">
-                    <div className="c-Account__Heading">
-                        <div className="c-Heading__Text">
-                            <h1>Payment History</h1>
-                            <p>This demo does not contain payment history feature.</p>
+                                <div className="c-Info__Btns">
+                                    <button type="button" className="c-Btn c-Btn--stripe-purple">Change Plan</button>
+                                    <button type="button" className="c-Btn c-Btn--stripe-purple-border">Cancel Subscription</button>
+                                </div>
+                            </div>
                         </div>
+
+                        <div className="l-Subscription__Payment-method">
+                            <div className="c-Subscription__Payment-method c-Payment-method">
+                                <div className="c-Payment-method__Left">
+                                    <h2>Payment Method</h2>
+                                    <div className="c-Left__Info">
+                                        {renderCardLogo("visa")}
+                                        <p>●●●● 4242</p>
+                                    </div>
+                                </div>
+                                <div className="c-Payment-method__Right">
+                                    <button type="button" className="c-Btn c-Btn--stripe-purple-border">Change Card</button>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <h2>Billing History</h2>
+                        <p>No Records Found!</p>
                     </div>
                 </div>
-
-                {/* Membership */}
-                <div className="c-Account__Membership">
-                    <h1>Membership</h1>
-                    <hr />
-                    <p>No Records Found!</p>
-                    <hr />
-                    <h2>Billing History</h2>
-                    <p>No Records Found!</p>
-                </div>
-            </div>
             </PageLayout>
         </>
     )

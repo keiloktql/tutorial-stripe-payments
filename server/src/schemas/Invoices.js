@@ -22,7 +22,7 @@ const Invoices = db.define(
             unique: true
         },
         stripe_payment_intent_status: {
-            type: DataTypes.ENUM(["succeeded", "requires_payment_method", "requires_action", "canceled"]),
+            type: DataTypes.ENUM(["succeeded", "requires_payment_method", "requires_action", "canceled", "incomplete"]),
             allowNull: true
         },
         amount: {
@@ -30,7 +30,7 @@ const Invoices = db.define(
             allowNull: false,
         },
         fk_stripe_subscription_id: {
-            type: DataTypes.INTEGER.UNSIGNED,
+            type: DataTypes.STRING(255),
             allowNull: false,
             references: {
                 model: Subscriptions,

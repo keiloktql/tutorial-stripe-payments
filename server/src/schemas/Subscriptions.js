@@ -43,6 +43,10 @@ const Subscriptions = db.define(
             type: DataTypes.ENUM(["active", "canceled", "canceling", "incomplete", "trialing", "past_due"]),
             allowNull: true
         },
+        trial_end: {
+            type: "TIMESTAMP",
+            allowNull: true
+        },
         current_period_start: {
             type: "TIMESTAMP",
             allowNull: true

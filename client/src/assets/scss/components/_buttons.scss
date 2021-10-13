@@ -34,21 +34,31 @@
     &--stripe-purple {
         color: white;
         background-color: $stripe-purple;
+        border: 1px solid $stripe-purple;
     }
 
     &--stripe-purple-empty {
         color: $stripe-purple;
         background-color: transparent;
+        border: 1px solid transparent;
+    }
+
+    &--stripe-purple-border {
+        background-color: white;
+        border: 1px solid $stripe-purple;
+        color:  $stripe-purple;
     }
 
     &--stripe-primary {
         color: white;
         background-color: $stripe-primary;
+        border: 1px solid $stripe-primary;
     }
 
     &--empty {
         background-color: transparent;
         color: $stripe-primary;
+        border: 1px solid transparent;
     }
 
     &--disabled {

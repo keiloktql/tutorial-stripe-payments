@@ -1,13 +1,14 @@
 // CONTROLLERS
 const accountController = require("./controllers/account");
 const authController = require("./controllers/auth");
-const stripeController = require("./controllers/stripe");
 const productController = require("./controllers/product");
+const stripeController = require("./controllers/stripe");
+const subscriptionController = require("./controllers/subscription");
 
 // MIDDLEWARES
+const { verifyStripeWebhookRequest } = require("./middlewares/access");
 const { isLoggedIn } = require("./middlewares/login");
 const { calculateProductsTotalPrice } = require("./middlewares/payment");
-const { verifyStripeWebhookRequest } = require("./middlewares/access");
 const { checkIfPlanExist } = require("./middlewares/subscription");
 
 module.exports = router => {
@@ -26,6 +27,11 @@ module.exports = router => {
     // ACCOUNTS
     router.get("/api/v1/account/:accountID", isLoggedIn, accountController.findAccountByID);
     router.post("/api/v1/account", accountController.createAccount);
+    router.put("/api/v1/account", isLoggedIn, accountController.editAccount);
+
+    // SUBSCRIPTIONS
+    router.get("/api/v1/subscription/active", isLoggedIn, subscriptionController.findActiveSubscription);
+    router.get("/api/v1/subscriptions/live", isLoggedIn, subscriptionController.findLiveSubscription);
 
     // STRIPE PAYMENT
 
@@ -45,10 +51,10 @@ module.exports = router => {
     router.post("/api/v1/stripe/subscriptions/:type", isLoggedIn, checkIfPlanExist, stripeController.createSubscription);
 
     // Update Subscription Plan
-    router.put("/api/v1/stripe/subscriptions/:type", isLoggedIn, checkIfPlanExist, stripeController.updateSubscriptionPlan);
+    router.put("/api/v1/stripe/subscriptions/:type", isLoggedIn, checkIfPlanExist, stripeController.updateSubscription);
     
-    // Update Subscription Default Payment Method
-    router.put("/api/v1/stripe/subscriptions", isLoggedIn, stripeController.updateSubscriptionPaymentMethod);
+    // Update Subscription Default Payment Method/Billing email
+    router.put("/api/v1/stripe/subscriptions", isLoggedIn, stripeController.updateSubscription);
 
     // Cancel Subscription
     router.delete("/api/v1/stripe/subscriptions", isLoggedIn, stripeController.cancelSubscription);

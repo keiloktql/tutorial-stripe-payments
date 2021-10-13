@@ -19,7 +19,6 @@
             }
 
             .c-Heading__Btn {
-                width: 100%;
                 display: flex;
                 justify-content: flex-end;
                 align-items: center;
@@ -179,12 +178,11 @@
                 width: 35px;
                 height: 35px;
             }
-
         }
 
     }
 
-    &__Membership {
+    &__Subscription {
         margin: 50px 0;
 
         h1 {
@@ -192,6 +190,135 @@
             font-weight: bold;
             font-size: $font-large;
         }
+        ::-webkit-scrollbar {
+            width: 20px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #d6dee1;
+            border-radius: 20px;
+            border: 6px solid transparent;
+            background-clip: content-box;
+
+            &:hover {
+                background-color: #a8bbbf;
+            }
+        }
+
+        .l-Subscription__Info {
+
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            flex-direction: column;
+            overflow-x: auto;
+            h2 {
+                font-size: $font-small;
+                color:rgb(0, 0, 0);
+            }
+            .c-Info {
+                display: flex;
+                margin: 20px 0;
+                max-width: 800px;
+                min-width: 500px;
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                overflow-x: auto;
+                &__Card {
+                    background-color: rgb(242, 217, 245);
+                    border-radius: 5px;
+                    padding: 30px;
+                    width: 250px;
+
+                    h2 {
+                        font-size: $font-small;
+                        color:rgb(0, 0, 0);
+                    }
+
+                    h3 {
+                        font-size: $font-large;
+                        color:$stripe-primary;
+                        font-weight: bold;
+                    }
+
+                    .c-Info__Card-chip {
+                        margin-top: 10px;
+                    }
+
+                }
+    
+                &__Btns {
+                    display: flex;
+                    flex-direction: column;
+                    button {
+                        margin-bottom: 10px;
+                    }
+                }
+            }
+        }
+
+        .l-Subscription__Payment-method {
+            overflow-x: auto;
+            .c-Payment-method {
+                display: flex;
+                margin: 20px 0;
+                max-width: 800px;
+                min-width: 450px;
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+     
+                &__Left {
+                    display: flex;
+                    flex-direction: column;
+                    .c-SVG__Visa {
+                        svg {
+                            width: 30.799px;
+                            height: 10px;
+                        }
+                    }
+            
+                    .c-SVG__Master {
+                        svg {
+                            width: 30.799px;
+                            height: 21.8px;
+                        }
+                    }
+            
+                    .c-SVG__Amex {
+                        svg {
+                            width: 35px;
+                            height: 35px;
+                        }
+                    }
+    
+                    .c-Left__Info {
+                        display: flex;
+                        flex-direction: row;
+                        align-items: center;
+    
+                        p {
+                            margin-left: 20px;
+                            font-weight: bold;
+                        }
+                    }
+                }
+    
+                &__Right {
+    
+                }
+    
+            }
+    
+        }
+
 
         hr {
             opacity: 0.7;

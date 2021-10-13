@@ -10,6 +10,7 @@ const { createStripeCustomer } = require("../src/services/stripe");
 // NPM modules import
 const bcrypt = require("bcryptjs");
 const chalk = require('chalk');
+const { ExclusiveContents } = require("../src/schemas/ExclusiveContents");
 
 
 module.exports.seeder = async () => {
@@ -35,7 +36,7 @@ module.exports.seeder = async () => {
 
             // Insert product
             await Products.create({
-                name: "iPhone 15 (Orange) - 128 GB",
+                name: "iTele 15 (Orange) - 128 GB",
                 price: "1299.90",
                 description: "Better than Apple.",
                 image_link: "http://localhost:3000/static/media/iphone_15_orange.d6d6f070.jpg"
@@ -47,17 +48,35 @@ module.exports.seeder = async () => {
                     name: "Standard",
                     price: "9.90",
                     description: "It's now or never, sign up now to waste money!",
-                    stripe_product_id: "1",
-                    stripe_price_id: "1"
+                    // Copy and paste product id and price id from Stripe dashboard
+                    stripe_product_id: "prod_KOrxSC360YBZiR",
+                    stripe_price_id: "price_1Jk4DlHXFJZDlbxPhKWZwik6"
                 },
                 {
                     name: "Premium",
                     price: "15.90",
                     description: "A slightly more expensive plan than standard plan.",
-                    stripe_product_id: "2",
-                    stripe_price_id: "2"
+                    // Copy and paste product id and price id from Stripe dashboard
+                    stripe_product_id: "prod_KOrvrHij2yIrRi",
+                    stripe_price_id: "price_1Jk4BiHXFJZDlbxPnocwx0Xm"
                 },
-            ])
+            ]);
+
+            // Insert Exclusive Contents
+            await ExclusiveContents.bulkCreate([
+                {
+                    content: "111",
+                    access_level: 1
+                },
+                {
+                    content: "222",
+                    access_level: 2
+                },
+                {
+                    content: "333",
+                    access_level: 3
+                },
+            ]);
         
         console.log(chalk.green("SEEDING COMPLETE"));
     } catch (error) {

@@ -17,9 +17,11 @@ module.exports.createAccount = (username, email, password, stripeCustomerID) => 
     email,
     trialed: false,
     passwords: [{
-        password: bcrypt.hashSync(password, 10)
+        password
     }],
     stripe_customer_id: stripeCustomerID
+}, {
+    include: 'passwords'
 });
 
 module.exports.updateAccountByID = (accountID, meta) => Accounts.update({
