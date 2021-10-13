@@ -40,6 +40,11 @@ module.exports.findPaymentMethodFromStripe = (paymentMethodID) => stripe.payment
   paymentMethodID
 );
 
+// Find payment intent
+module.exports.findPaymentIntent = (paymentIntentID) => stripe.paymentIntents.retrieve(
+  paymentIntentID
+);
+
 // Create setup intent
 module.exports.createSetupIntent = (customerID) => stripe.setupIntents.create({
   customer: customerID,
@@ -52,38 +57,30 @@ module.exports.createSubscriptionInStripe = (customerID, subscriptionPriceID, em
     price: subscriptionPriceID
   }],
   payment_behavior: 'default_incomplete',
+  proration_behavior: 'always_invoice',
   expand: ['latest_invoice.payment_intent'],
   receipt_email: email // setting email for receipt_email will tell Stripe to automatically  send email for successful payments
 });
 
-// Update subscription plan
-module.exports.updateSubscriptionPlanInStripe = (subscriptionID, subscriptionPriceID) => stripe.subscriptions.update(
+// Update subscription (general) to be done tmr
+module.exports.updateSubscriptionInStripe = (subscriptionID, meta) => stripe.subscriptions.update(
   subscriptionID,
   {
-    items: [{
-      price: subscriptionPriceID
-    }],
-    proration_behavior: none
-  },
-);
-
-// Update subscription payment method
-module.exports.updateSubscriptionPaymentMethodInStripe = (subscriptionID, paymentMethodID) => stripe.subscriptions.update(
-  subscriptionID,
-  {
-    default_payment_method: paymentMethodID
-  }
-);
-
-// Update subscription email
-module.exports.updateSubscriptionEmailInStripe = (subscriptionID, email) => stripe.subscriptions.update(
-  subscriptionID,
-  {
-    receipt_email: email  // invoice email will be sent to this email automatically
+    ...meta,
+    cancel_at_period_end: false,
   }
 );
 
 // Cancel subscription
 module.exports.cancelSubscription = (stripeSubscriptionID) => stripe.subscriptions.del(
-  stripeSubscriptionID
+  stripeSubscriptionID, {
+    cancel_at_period_end: true // by default, Stripe cancels subscription immediately.
+                               // Having this option will tell Stripe to cancel only the
+                               // end of the current billing period
+  }
+);
+
+// Find invoice
+module.exports.findInvoiceInStripe = (latestInvoiceID) => await stripe.invoices.retrieve(
+  latestInvoiceID
 );

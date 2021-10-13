@@ -1,7 +1,6 @@
 const bcrypt = require("bcryptjs");
 
 const { findAccountByID, createAccount, updateAccountByID } = require('../models/account');
-const { findActiveSubscription } = require("../models/subscription");
 const { createStripeCustomer, updateStripeCustomer } = require('../services/stripe');
 
 // Get account by ID

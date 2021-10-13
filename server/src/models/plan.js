@@ -7,3 +7,10 @@ module.exports.findPlan = (type) => Plans.findOne({
         name: type
     }
 });
+
+// Find Plan By PriceID
+module.exports.findPlanByPriceID = (priceID) => Plans.findOne({
+    where: {
+        stripe_price_id: priceID
+    }
+});

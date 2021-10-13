@@ -1,6 +1,6 @@
 const { Accounts } = require("./src/schemas/Accounts");
 const { Accounts_PaymentMethods } = require("./src/schemas/Accounts_PaymentMethods");
-const { Billings } = require("./src/schemas/Billings");
+const { Invoices } = require("./src/schemas/Invoices");
 const { Passwords } = require("./src/schemas/Passwords");
 const { PaymentMethods } = require("./src/schemas/PaymentMethods");
 const { Plans } = require("./src/schemas/Plans");

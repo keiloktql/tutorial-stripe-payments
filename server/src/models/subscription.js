@@ -1,4 +1,5 @@
 const { Op } = require("sequelize");
+const { Invoices } = require("../schemas/Invoices");
 
 const { Plans } = require("../schemas/Plans");
 const { Subscriptions } = require("../schemas/Subscriptions");
@@ -13,27 +14,11 @@ module.exports.createSubscription = (subscriptionID, planID, accountID, paymentI
     stripe_status: "incomplete"
 });
 
-// Update Subscription Plan
-module.exports.updateSubscriptionPlan = (subscriptionID, planID) => Subscriptions.update({
-    fk_plan_id: planID,
+// Update Subscription
+module.exports.updateSubscription = (subscriptionID, meta) => Subscriptions.update({
+    ...meta,
     where: {
-        stripe_subscription_id: subscriptionID,
-    }
-});
-
-// Update Subscription Status
-module.exports.updateSubscriptionStatus = (subscriptionID, status) => Subscriptions.update({
-    stripe_status: status,
-    where: {
-        stripe_subscription_id: subscriptionID,
-    }
-});
-
-// Update Subscription Payment method
-module.exports.updateSubscriptionPaymentMethod = (subscriptionID, paymentMethodID) => Subscriptions.update({
-    fk_payment_method: paymentMethodID,
-    where: {
-        stripe_subscription_id: subscriptionID,
+        stripe_subscription_id: subscriptionID
     }
 });
 
@@ -42,12 +27,12 @@ module.exports.deleteSubscription = (subscriptionID) => Subscriptions.destroy({
     where: {
         stripe_subscription_id: subscriptionID
     }
-})
+});
 
-// Find active subscriptions
-// Active means subscription status aka stripe_status can be: 
+// Find live subscriptions
+// live means subscription status aka stripe_status can be: 
 // 'incomplete', 'active', 'trialing', 'past_due'
-module.exports.findActiveSubscription = (accountID) => Subscriptions.findOne({
+module.exports.findLiveSubscription = (accountID) => Subscriptions.findOne({
     where: {
         fk_account_id: accountID,
         stripe_status: {
@@ -58,4 +43,31 @@ module.exports.findActiveSubscription = (accountID) => Subscriptions.findOne({
         model: Plans,
         as: "plan"
     }] 
+});
+
+// Find active subscriptiobs
+// active meanssubscription status aka stripe_status can be:
+// 'active', 'trialing', 'past_due'
+module.exports.findActiveSubscription = (accountID) => Subscriptions.findOne({
+    where: {
+        fk_account_id: accountID,
+        stripe_status: {
+            [Op.notIn]: ["canceled", "incomplete"]
+        }
+    },
+    include: [{
+        model: Plans,
+        as: "plan"
+    }] 
+});
+
+// Find all subscriptions by accountID
+module.exports.findSubscriptionsByAccountID = (accountID) => Subscriptions.findAll({
+    where: {
+        fk_account_id: accountID
+    },
+    include: [{
+        model: Invoices,
+        as: "invoice"
+    }]
 });

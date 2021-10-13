@@ -30,30 +30,7 @@ const Subscriptions = db.define(
                 key: "account_id"
             }
         },
-        // Stripe
-        stripe_payment_intent_id: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
-            unique: true
-        },
-        stripe_client_secret: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
-            unique: true
-        },
-        stripe_schedule_id: {
-            type: DataTypes.STRING(255),
-            allowNull: true,
-            unique: true
-        },
-        fk_change_plan_id: {
-            type: DataTypes.INTEGER.UNSIGNED,
-            allowNull: true,
-            references: {
-                model: Plans,
-                key: "plan_id"
-            }
-        },
+        // Default payment method
         fk_payment_method: {
             type: DataTypes.STRING(255),
             allowNull: true,
@@ -62,12 +39,8 @@ const Subscriptions = db.define(
                 key: "stripe_payment_method_id"
             }
         },
-        stripe_payment_intent_status: {
-            type: DataTypes.ENUM(["succeeded", "requires_payment_method", "requires_action"]),
-            allowNull: true
-        },
         stripe_status: {
-            type: DataTypes.ENUM(["active", "canceled", "incomplete", "trialing", "past_due"]),
+            type: DataTypes.ENUM(["active", "canceled", "canceling", "incomplete", "trialing", "past_due"]),
             allowNull: true
         },
         current_period_start: {
@@ -75,16 +48,6 @@ const Subscriptions = db.define(
             allowNull: true
         },
         current_period_end: {
-            type: "TIMESTAMP",
-            allowNull: true
-        },
-        start_date: {
-            // Timestamp when user starts subscription (includes free trial)
-            type: "TIMESTAMP",
-            allowNull: true
-        },
-        end_date: {
-            // Timestamp when subscription is cancelled
             type: "TIMESTAMP",
             allowNull: true
         }
@@ -115,16 +78,6 @@ Plans.hasMany(Subscriptions, {
 Subscriptions.belongsTo(Plans, {
     foreignKey: "fk_plan_id",
     as: "plan"
-});
-
-Plans.hasMany(Subscriptions, {
-    foreignKey: "fk_change_plan_id",
-    as: "subscription"
-});
-
-Subscriptions.belongsTo(Plans, {
-    foreignKey: "fk_change_plan_id",
-    as: "change_plan"
 });
 
 PaymentMethods.hasMany(Subscriptions, {
