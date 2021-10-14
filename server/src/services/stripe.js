@@ -54,7 +54,7 @@ module.exports.createSetupIntent = (customerID) => stripe.setupIntents.create({
 });
 
 // Create subscription
-module.exports.createSubscriptionInStripe = (customerID, subscriptionPriceID, email, meta) => stripe.subscriptions.create({
+module.exports.createSubscriptionInStripe = (customerID, subscriptionPriceID, meta) => stripe.subscriptions.create({
   ...meta,
   customer: customerID,
   items: [{
@@ -63,8 +63,12 @@ module.exports.createSubscriptionInStripe = (customerID, subscriptionPriceID, em
   payment_behavior: 'default_incomplete',
   proration_behavior: 'always_invoice',
   expand: ['latest_invoice.payment_intent'],
-  receipt_email: email // setting email for receipt_email will tell Stripe to automatically  send email for successful payments
 });
+
+// Find subscription
+module.exports.findSubscriptionInStripe = (subscriptionID) => stripe.subscriptions.retrieve(
+  subscriptionID
+);
 
 // Update subscription (general) to be done tmr
 module.exports.updateSubscriptionInStripe = (subscriptionID, meta) => stripe.subscriptions.update(
@@ -77,14 +81,10 @@ module.exports.updateSubscriptionInStripe = (subscriptionID, meta) => stripe.sub
 
 // Cancel subscription
 module.exports.cancelSubscription = (stripeSubscriptionID) => stripe.subscriptions.del(
-  stripeSubscriptionID, {
-    cancel_at_period_end: true // by default, Stripe cancels subscription immediately.
-                               // Having this option will tell Stripe to cancel only the
-                               // end of the current billing period
-  }
+  stripeSubscriptionID
 );
 
 // Find invoice
-module.exports.findInvoiceInStripe = (latestInvoiceID) => stripe.invoices.retrieve(
-  latestInvoiceID
+module.exports.findInvoiceInStripe = (invoiceID) => stripe.invoices.retrieve(
+  invoiceID
 );

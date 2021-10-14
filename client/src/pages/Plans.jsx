@@ -16,13 +16,13 @@ const Plans = () => {
                         name="Standard"
                         price="9.90"
                         description="It's now or never, sign up now to waste money!"
-                        planID="1"
+                        planID="1" // hardcoded
                     />
                     <PlansCard
                         name="Premium"
                         price="15.90"
                         description="A slightly more expensive plan than standard plan."
-                        planID="2"
+                        planID="2" // hardcoded
                     />
                 </div>
             </div>

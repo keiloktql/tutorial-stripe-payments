@@ -1,5 +1,6 @@
 const { Op } = require("sequelize");
 const { Invoices } = require("../schemas/Invoices");
+const { PaymentMethods } = require("../schemas/PaymentMethods");
 
 const { Plans } = require("../schemas/Plans");
 const { Subscriptions } = require("../schemas/Subscriptions");
@@ -16,6 +17,7 @@ module.exports.createSubscription = (subscriptionID, planID, accountID, status, 
 // Update Subscription
 module.exports.updateSubscription = (subscriptionID, meta) => Subscriptions.update({
     ...meta,
+}, {
     where: {
         stripe_subscription_id: subscriptionID
     }
@@ -44,12 +46,15 @@ module.exports.findLiveSubscription = (accountID) => Subscriptions.findOne({
     }, {
         model: Invoices,
         as: "invoice"
+    }, {
+        model: PaymentMethods,
+        as: "payment_method"
     }] 
 });
 
 // Find active subscriptiobs
 // active means subscription status aka stripe_status can be:
-// 'active', 'trialing', 'past_due'
+// 'active', 'trialing', 'past_due', 'canceling'
 module.exports.findActiveSubscription = (accountID) => Subscriptions.findOne({
     where: {
         fk_account_id: accountID,
@@ -60,6 +65,12 @@ module.exports.findActiveSubscription = (accountID) => Subscriptions.findOne({
     include: [{
         model: Plans,
         as: "plan"
+    }, {
+        model: Invoices,
+        as: "invoice"
+    }, {
+        model: PaymentMethods,
+        as: "payment_method"
     }] 
 });
 

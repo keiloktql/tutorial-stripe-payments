@@ -1,0 +1,36 @@
+// react-confirm-alert styles
+.c-Confirm-alert {
+  font-family: $font-family;
+  max-width: 800px;
+  min-width: 500px;
+  width: 100%;
+  padding: 30px 60px;
+  text-align: left;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 20px 75px rgb(0 0 0 / 13%);
+  color: #666;
+
+  h1 {
+    font-size: $font-medium;
+    font-weight: bold;
+    color: black;
+  }
+  p {
+    margin: 15px 0;
+  }
+
+  &__Buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+
+    button {
+      margin-right: 10px;
+    }
+
+    button:first-of-type {
+      margin-left: 0;
+    }
+  }
+}

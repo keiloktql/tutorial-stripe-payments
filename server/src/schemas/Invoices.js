@@ -11,6 +11,11 @@ const Invoices = db.define(
             primaryKey: true,
             autoIncrement: false
         },
+        stripe_reference_number: {
+            type: DataTypes.STRING(255),
+            allowNull: true,
+            unique: true
+        },
         stripe_payment_intent_id: {
             type: DataTypes.STRING(255),
             allowNull: true,
@@ -26,8 +31,8 @@ const Invoices = db.define(
             allowNull: true
         },
         amount: {
-            type: DataTypes.INTEGER.UNSIGNED,
-            allowNull: false,
+            type: DataTypes.STRING(255),
+            allowNull: true,
         },
         fk_stripe_subscription_id: {
             type: DataTypes.STRING(255),

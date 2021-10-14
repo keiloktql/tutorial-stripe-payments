@@ -4,6 +4,8 @@ import Routes from './Routes';
 import config from './config/config';
 import './assets/scss/main.scss';
 import 'react-toastify/dist/ReactToastify.css';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 

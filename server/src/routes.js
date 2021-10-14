@@ -31,7 +31,7 @@ module.exports = router => {
 
     // SUBSCRIPTIONS
     router.get("/api/v1/subscription/active", isLoggedIn, subscriptionController.findActiveSubscription);
-    router.get("/api/v1/subscriptions/live", isLoggedIn, subscriptionController.findLiveSubscription);
+    router.get("/api/v1/subscription/live", isLoggedIn, subscriptionController.findLiveSubscription);
 
     // STRIPE PAYMENT
 

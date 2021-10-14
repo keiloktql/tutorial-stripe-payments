@@ -12,7 +12,7 @@ module.exports.findActiveSubscription = async (req, res) => {
 
         const activeSubscription = await findActiveSubscription(accountID);
 
-        if (!activeSubscription.length) return res.status(204).send();
+        if (!activeSubscription) return res.status(204).send();
 
         return res.status(200).send({ activeSubscription });
 
@@ -34,7 +34,7 @@ module.exports.findLiveSubscription = async (req, res) => {
 
         const liveSubscription = await findLiveSubscription(accountID);
 
-        if (!liveSubscription.length) return res.status(204).send();
+        if (!liveSubscription) return res.status(204).send();
 
         return res.status(200).send({ liveSubscription });
 

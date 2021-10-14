@@ -179,7 +179,24 @@ const PlansCheckout = ({ match }) => {
         setPaymentProcessing(() => true);
 
         if (freeTrial) {
+            try {
+                await axios.post(`${config.baseUrl}/stripe/subscriptions/${type}`, {
+                    paymentMethodID: selectedPaymentMethod
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
 
+                setPaymentError(() => null);
+                setPaymentProcessing(false);
+                setPaymentSuccess(() => true);
+            } catch (error) {
+                console.log(error);
+                // Error
+                setPaymentError(() => `Error! Try again later!`);
+                setPaymentProcessing(() => false);
+            }
         } else {
             // If user has already trialed, 
             if (selectedPaymentMethod) {
@@ -229,9 +246,9 @@ const PlansCheckout = ({ match }) => {
                                         <div className="c-Plans-checkout__Heading">
                                             <h1>You are subscribing to <b>{type}</b> plan.</h1>
                                             <p>
-                                                {freeTrial ? 
-                                                <> Enjoy 7 Days of Premium Plan Free Trial. <br/>Card will be automatically billed monthly.</> : 
-                                                "Card will be automatically billed monthly"}
+                                                {freeTrial ?
+                                                    <> Enjoy 7 Days of Premium Plan Free Trial. <br />Card will be automatically billed monthly.</> :
+                                                    "Card will be automatically billed monthly"}
                                             </p>
                                         </div>
 
@@ -244,7 +261,14 @@ const PlansCheckout = ({ match }) => {
                                                     paymentMethods.length > 0 ?
                                                         paymentMethods.map((paymentMethod, index) => (
                                                             <div className="c-Card-info__Payment-methods" key={index}>
-                                                                <SelectPaymentMethod index={index} cardBrand={paymentMethod.cardBrand} last4={paymentMethod.last4} expDate={paymentMethod.expDate} stripePaymentMethodID={paymentMethod.stripePaymentMethodID} selectedPaymentMethod={selectedPaymentMethod} handleSelectPaymentMethod={handleSelectPaymentMethod} disabled={paymentProcessing} />
+                                                                <SelectPaymentMethod
+                                                                    index={index}
+                                                                    cardBrand={paymentMethod.cardBrand}
+                                                                    last4={paymentMethod.last4}
+                                                                    expDate={paymentMethod.expDate}
+                                                                    stripePaymentMethodID={paymentMethod.stripePaymentMethodID}
+                                                                    selectedPaymentMethod={selectedPaymentMethod}
+                                                                    handleSelectPaymentMethod={handleSelectPaymentMethod} disabled={paymentProcessing} />
                                                             </div>
                                                         ))
                                                         :

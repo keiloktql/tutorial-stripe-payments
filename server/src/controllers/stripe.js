@@ -1,12 +1,12 @@
 const dayjs = require('dayjs');
 
 // Imports
-const { createPaymentIntent, updatePaymentIntent, detachPaymentMethod, createSetupIntent, findPaymentMethodFromStripe, updateSubscriptionInStripe, findPaymentIntent, createSubscriptionInStripe } = require('../services/stripe');
+const { createPaymentIntent, updatePaymentIntent, detachPaymentMethod, createSetupIntent, findPaymentMethodFromStripe, updateSubscriptionInStripe, findPaymentIntent, createSubscriptionInStripe, cancelSubscription, findInvoiceInStripe, findSubscriptionInStripe } = require('../services/stripe');
 const { findAccountByID, updateAccountByID, findAccountByStripeCustID } = require('../models/account');
 const { findPaymentMethod, findDuplicatePaymentMethod, insertPaymentMethod, removePaymentMethod, updatePaymentMethod } = require('../models/paymentMethod');
-const { deleteSubscription, updateSubscription, createSubscription, findLiveSubscription, findActiveSubscription } = require('../models/subscription');
+const { deleteSubscription, updateSubscription, createSubscription, findLiveSubscription } = require('../models/subscription');
 const { findPlanByPriceID } = require('../models/plan');
-const { findInvoice, createInvoice } = require('../models/invoice');
+const { findInvoice, createInvoice, updateInvoice } = require('../models/invoice');
 
 // Create payment intent
 module.exports.createPaymentIntent = async (req, res) => {
@@ -258,7 +258,7 @@ module.exports.createSubscription = async (req, res) => {
             const tempTrialEndDate = Math.floor(Date.now() / 1000) + 180; // for testing, trial lasts for 3 mins
 
             // Create subscription in Stripe
-            const subscription = await createSubscriptionInStripe(account.stripe_customer_id, priceID, account.email, {
+            const subscription = await createSubscriptionInStripe(account.stripe_customer_id, priceID, {
                 trial_end: tempTrialEndDate,
                 default_payment_method: paymentMethodID
             });
@@ -268,17 +268,13 @@ module.exports.createSubscription = async (req, res) => {
 
             // Create subscription in our Database
             await createSubscription(subscriptionID, planID, accountID, 'trialing', {
-                trial_end: dayjs(tempTrialEndDate).toDate(),
+                trial_end: dayjs(tempTrialEndDate * 1000).toDate(),
                 fk_payment_method: paymentMethodID
             });
 
-            // Update user trialed status to prevent user from access to free trial multiple times
-            await updateAccountByID(accountID, {
-                trialed: true
-            });
         } else {
             // Create subscription in Stripe
-            const subscription = await createSubscriptionInStripe(account.stripe_customer_id, priceID, account.email);
+            const subscription = await createSubscriptionInStripe(account.stripe_customer_id, priceID);
             const subscriptionID = subscription.id;
             const planID = plan.plan_id;
             const paymentIntentID = subscription.latest_invoice.payment_intent.id;
@@ -292,7 +288,6 @@ module.exports.createSubscription = async (req, res) => {
                 stripe_payment_intent_id: paymentIntentID,
                 stripe_client_secret: clientSecret,
                 stripe_payment_intent_status: 'incomplete',
-                amount,
                 fk_stripe_subscription_id: subscriptionID,
             });
         }
@@ -311,7 +306,7 @@ module.exports.updateSubscription = async (req, res) => {
         const { decoded } = res.locals.auth;
         const plan = res.locals.plan;
         const accountID = parseInt(decoded.account_id);
-        const { paymentMethodID, billingEmail } = req.body;
+        const { paymentMethodID } = req.body;
 
         if (isNaN(accountID)) return res.status(400).json({
             message: "Invalid parameter \"accountID\""
@@ -344,8 +339,15 @@ module.exports.updateSubscription = async (req, res) => {
                 message: "Same plan change not allowed!"
             });
 
+            console.log(plan.plan_id);
+            console.log(liveSubscription.plan.plan_id);
+
+            // Find subscription item id to uddate
+            const subscription = await findSubscriptionInStripe(subscriptionID);
+
             await updateSubscriptionInStripe(subscriptionID, {
                 items: [{
+                    id: subscription.items.data[0].id,
                     price: priceID
                 }]
             });
@@ -370,16 +372,6 @@ module.exports.updateSubscription = async (req, res) => {
             await updateSubscription(subscriptionID, { fk_payment_method: paymentMethodID });
         }
 
-        // Change billing email
-        // Invoice will be sent to this email instead
-        if (billingEmail) {
-            // Update billing email in Stripe
-            await updateSubscriptionInStripe(subscriptionID, { reciept_email: billingEmail })
-
-            // Update billing email in our Database
-            await updateSubscription(subscriptionID, { billing_email: billingEmail });
-        }
-
         return res.status(200).send();
 
     } catch (error) {
@@ -400,7 +392,7 @@ module.exports.cancelSubscription = async (req, res) => {
 
         // Check if user has live subscriptions
         // live means subscription status aka stripe_status can be: 
-        // 'incomplete', 'active', 'trialing', 'past_due'
+        // 'incomplete', 'active', 'trialing', 'past_due', 'canceling'
         const liveSubscription = await findLiveSubscription(accountID);
 
         // If user don't have live subscription, throw error
@@ -410,13 +402,26 @@ module.exports.cancelSubscription = async (req, res) => {
 
         const subscriptionID = liveSubscription.stripe_subscription_id;
 
-        // Cancel subscription in Stripe
-        await cancelSubscription(subscriptionID);
+        if (liveSubscription.stripe_status === "trialing") {
+            // Cancel subscription straight away
+            await cancelSubscription(subscriptionID);
+            // Update subscription status in our Database
+            await updateSubscription(subscriptionID, {
+                stripe_status: "canceled"
+            });
 
-        // Update subscription status in our Database
-        await updateSubscription(subscriptionID, {
-            stripe_status: "canceling"
-        });
+        } else {
+            // Update subscription cancel date in Stripe
+            await updateSubscriptionInStripe(subscriptionID, {
+                cancel_at_period_end: true // by default, Stripe cancels subscription immediately.
+                // Having this option will tell Stripe to cancel only the
+                // end of the current billing period
+            });
+            // Update subscription status in our Database
+            await updateSubscription(subscriptionID, {
+                stripe_status: "canceling"
+            });
+        }
 
         return res.status(200).send();
 
@@ -474,79 +479,86 @@ module.exports.handleWebhook = async (req, res) => {
 
             case 'invoice.paid': {
                 const invoice = event.data.object;
-                const subscriptionID = invoice.subscription;
-                const paymentIntentID = invoice.payment_intent;
-
-                const paymentIntent = await findPaymentIntent(paymentIntentID);
-                const paymentMethod = paymentIntent.payment_method;
-                const paymentMethodID = paymentMethod.id;
-
-                // https://stripe.com/docs/api/invoices/object#invoice_object-billing_reason
-                if (invoice.billing_reason === 'subscription_create') {
-                    console.log(
-                        `
-                        ---------------------
-                        ran subscription create webhook function
-                        ----------------------
-                        `
-                    );
-                    // Update subscription payment method in Stripe
-                    await updateSubscriptionInStripe(subscriptionID, { default_payment_method: paymentMethodID });
-
-                    // Update subscription payment method in our database
-                    await updateSubscription(subscriptionID, { fk_payment_method: paymentMethodID });
-                }
-
-                // Find plan based on price id
-                const priceID = invoice.lines.data[0].price.id;
-                const plan = await findPlanByPriceID(priceID);
-                const amount = plan.price; // price of subscription plan
-
-                // billing cycle
-                const currentPeriodStart = dayjs(invoice.period_start).toDate();
-                const currentPeriodEnd = dayjs(invoice.period_end).toDate();
-
-                // Payment method information
-                const cardFingerprint = paymentMethod.card.fingerprint;
-                const cardLastFourDigit = paymentMethod.card.last4;
-                const cardType = paymentMethod.card.brand;
-                const cardExpMonth = paymentMethod.card.exp_month.toString();
-                const cardExpYear = paymentMethod.card.exp_year.toString();
-                const cardExpDate = cardExpMonth + "/" + cardExpYear.charAt(2) + cardExpYear.charAt(3);
-
-                // Check if invoice exists in our Database already
-                const invoiceExists = findInvoice(invoice.id);
-                if (invoiceExists) {
-                    // Update invoice
-                    await updateInvoice(invoice.id, {
-                        stripe_payment_intent_status: 'succeeded',
-                        amount,
-                        fk_stripe_subscription_id: subscriptionID,
-                        stripe_period_start: currentPeriodStart,
-                        stripe_period_end: currentPeriodEnd,
-                        stripe_payment_method_fingerprint: cardFingerprint,
-                        stripe_card_exp_date: cardExpDate,
-                        stripe_card_last_four_digit: cardLastFourDigit,
-                        stripe_card_type: cardType
+                const account = await findAccountByStripeCustID(invoice.customer);
+                const accountID = account.account_id;
+                // If this is user's first time subscribing
+                if (!account.trialed) {
+                    // Update user trialed status to prevent user from access to free trial multiple times
+                    await updateAccountByID(accountID, {
+                        trialed: true
                     });
                 } else {
-                    const clientSecret = paymentIntent.client_secret;
+                    const subscriptionID = invoice.subscription;
+                    const paymentIntentID = invoice.payment_intent;
 
-                    // Insert invoice
-                    await createInvoice({
-                        stripe_invoice_id: invoice.id,
-                        stripe_payment_intent_id: paymentIntentID,
-                        stripe_client_secret: clientSecret,
-                        stripe_payment_intent_status: 'succeeded',
-                        amount,
-                        fk_stripe_subscription_id: subscriptionID,
-                        stripe_period_start: currentPeriodStart,
-                        stripe_period_end: currentPeriodEnd,
-                        stripe_payment_method_fingerprint: cardFingerprint,
-                        stripe_card_exp_date: cardExpDate,
-                        stripe_card_last_four_digit: cardLastFourDigit,
-                        stripe_card_type: cardType
-                    });
+                    const paymentIntent = await findPaymentIntent(paymentIntentID);
+                    const paymentMethod = paymentIntent.payment_method;
+                    const paymentMethodID = paymentMethod.id;
+
+                    // https://stripe.com/docs/api/invoices/object#invoice_object-billing_reason
+                    if (invoice.billing_reason === 'subscription_create') {
+
+                        // Update subscription payment method in Stripe
+                        await updateSubscriptionInStripe(subscriptionID, { default_payment_method: paymentMethodID });
+
+                        // Update subscription payment method in our database
+                        await updateSubscription(subscriptionID, { fk_payment_method: paymentMethodID });
+
+                    }
+
+                    // Find plan based on price id
+                    const priceID = invoice.lines.data[0].price.id;
+                    const plan = await findPlanByPriceID(priceID);
+                    const amount = plan.price; // price of subscription plan
+
+                    // billing cycle
+                    const currentPeriodStart = dayjs(invoice.period_start).toDate();
+                    const currentPeriodEnd = dayjs(invoice.period_end).toDate();
+
+                    // Payment method information
+                    const cardFingerprint = paymentMethod.card.fingerprint;
+                    const cardLastFourDigit = paymentMethod.card.last4;
+                    const cardType = paymentMethod.card.brand;
+                    const cardExpMonth = paymentMethod.card.exp_month.toString();
+                    const cardExpYear = paymentMethod.card.exp_year.toString();
+                    const cardExpDate = cardExpMonth + "/" + cardExpYear.charAt(2) + cardExpYear.charAt(3);
+
+                    // Check if invoice exists in our Database already
+                    const invoiceExists = await findInvoice(invoice.id);
+
+                    if (invoiceExists) {
+                        // Update invoice
+                        await updateInvoice(invoice.id, {
+                            stripe_payment_intent_status: 'succeeded',
+                            stripe_reference_number: invoice.number,
+                            amount,
+                            fk_stripe_subscription_id: subscriptionID,
+                            stripe_period_start: currentPeriodStart,
+                            stripe_period_end: currentPeriodEnd,
+                            stripe_payment_method_fingerprint: cardFingerprint,
+                            stripe_card_exp_date: cardExpDate,
+                            stripe_card_last_four_digit: cardLastFourDigit,
+                            stripe_card_type: cardType
+                        });
+                    } else {
+                        const clientSecret = paymentIntent.client_secret;
+                        // Insert invoice
+                        await createInvoice({
+                            stripe_invoice_id: invoice.id,
+                            stripe_reference_number: invoice.number,
+                            stripe_payment_intent_id: paymentIntentID,
+                            stripe_client_secret: clientSecret,
+                            stripe_payment_intent_status: 'succeeded',
+                            amount,
+                            fk_stripe_subscription_id: subscriptionID,
+                            stripe_period_start: currentPeriodStart,
+                            stripe_period_end: currentPeriodEnd,
+                            stripe_payment_method_fingerprint: cardFingerprint,
+                            stripe_card_exp_date: cardExpDate,
+                            stripe_card_last_four_digit: cardLastFourDigit,
+                            stripe_card_type: cardType
+                        });
+                    }
                 }
 
                 // Send email to user
@@ -562,19 +574,19 @@ module.exports.handleWebhook = async (req, res) => {
                     // Delete subscription in database if subscription status is 'incomplete_expired'
                     deleteSubscription(subscriptionID);
                 } else {
+                    const latestInvoiceID = subscription.latest_invoice;
+                    const invoice = await findInvoiceInStripe(latestInvoiceID);
+
                     const priceID = invoice.lines.data[0].price.id;
                     const plan = await findPlanByPriceID(priceID);
-
                     // Only applicable for canceled subscription
                     if (subscriptionStatus === "canceled") {
-                        const latestInvoiceID = subscription.latest_invoice;
-                        const invoice = await findInvoiceInStripe(latestInvoiceID);
 
                         // Only applicable for cancellations due to overdue payments
                         if (invoice.status !== 'paid') {
                             const amount = plan.price; // price of subscription plan
-                            const currentPeriodStart = dayjs(invoice.period_start).toDate();
-                            const currentPeriodEnd = dayjs(invoice.period_end).toDate();
+                            const currentPeriodStart = dayjs(invoice.period_start * 1000).toDate();
+                            const currentPeriodEnd = dayjs(invoice.period_end * 1000).toDate();
 
                             const invoiceExists = await findInvoice(latestInvoiceID);
                             if (invoiceExists) {
@@ -602,8 +614,8 @@ module.exports.handleWebhook = async (req, res) => {
 
                     const planID = plan.plan_id;
                     // New billing cycle date
-                    const subscriptionPeriodStart = dayjs(subscription.current_period_start).toDate(); // dayjs function converts unix time to native Date Object
-                    const subscriptionPeriodEnd = dayjs(subscription.current_period_end).toDate();
+                    const subscriptionPeriodStart = dayjs(subscription.current_period_start * 1000).toDate(); // dayjs function converts unix time to native Date Object
+                    const subscriptionPeriodEnd = dayjs(subscription.current_period_end * 1000).toDate();
 
                     // Update plan, subscription status, and new billing cycle in our Database
                     updateSubscription(subscriptionID, {
@@ -638,6 +650,7 @@ module.exports.handleWebhook = async (req, res) => {
                     // Update invoice
                     await updateInvoice(invoice.id, {
                         stripe_payment_intent_status: 'requires_payment_method',
+                        stripe_reference_number: invoice.number,
                         amount,
                         fk_stripe_subscription_id: subscriptionID,
                         stripe_period_start: currentPeriodStart,
@@ -651,6 +664,7 @@ module.exports.handleWebhook = async (req, res) => {
                     // Insert invoice
                     await createInvoice({
                         stripe_invoice_id: invoice.id,
+                        stripe_reference_number: invoice.number,
                         stripe_payment_intent_id: paymentIntentID,
                         stripe_client_secret: clientSecret,
                         stripe_payment_intent_status: 'requires_payment_method',
@@ -662,7 +676,6 @@ module.exports.handleWebhook = async (req, res) => {
                 }
 
                 // Send email to customer informing them to take action
-
                 break;
             }
 

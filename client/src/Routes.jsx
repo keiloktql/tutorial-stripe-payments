@@ -3,8 +3,9 @@ import React from 'react';
 import { Route, BrowserRouter as Router, Switch, Redirect } from 'react-router-dom';
 
 // React components import
-import Home from './pages/Home';
 import Account from './pages/Account';
+import ChangePlan from './pages/ChangePlan';
+import Home from './pages/Home';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Checkout from './pages/Checkout';
@@ -43,6 +44,7 @@ const Routes = () => {
                 <Route path="/signup" render={() => <SignUp />} />
                 <Route exact path="/plans" render={() => <Plans />} />
                 <Route path="/plans/payment/:type" render={(props) => authGuard(PlansCheckout)(props)} />
+                <Route path="/plans/change" render={(props) => authGuard(ChangePlan)(props)} />
                 <Route path="/logged-out" render={() => <LoggedOut />} />
             </Switch>
         </Router>
