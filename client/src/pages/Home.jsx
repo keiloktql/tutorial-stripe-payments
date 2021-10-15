@@ -62,6 +62,70 @@ const Home = () => {
         }
       }
 
+      try {
+        // Get exclusive content, access: all
+        const response = await axios.get(`${config.baseUrl}/exclusive-contents/all`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (componentMounted) {
+          const ecData = response.data;
+          if (ecData.exclusiveContent?.length > 0) {
+            setExclusiveContent((prevState) => ({
+              ...prevState,
+              all: ecData?.exclusiveContent[0]
+            }));
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
+      try {
+        // Get exclusive content, access: Premium, standard, free trial users only
+        const response = await axios.get(`${config.baseUrl}/exclusive-contents/standard`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (componentMounted) {
+          const ecData = response.data;
+          if (ecData.exclusiveContent?.length > 0) {
+
+            setExclusiveContent((prevState) => ({
+              ...prevState,
+              standard: ecData?.exclusiveContent[0]
+            }));
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
+      try {
+        // Get exclusive content, access: Premium and free trial users only
+        const response = await axios.get(`${config.baseUrl}/exclusive-contents/premium`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (componentMounted) {
+          const ecData = response.data;
+          if (ecData.exclusiveContent?.length > 0) {
+            setExclusiveContent((prevState) => ({
+              ...prevState,
+              premium: ecData?.exclusiveContent[0]
+            }));
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+
     })();
 
     return (() => {
@@ -115,9 +179,9 @@ const Home = () => {
               </ul>
             </div>
             <div className="c-Home__Bento-boxes">
-              <HomeBentoBox content={exclusiveContent.all} heading="All users" variation={1} />
-              <HomeBentoBox content={exclusiveContent.standard} variation={2} />
-              <HomeBentoBox content={exclusiveContent.premium} variation={3} />
+              <HomeBentoBox content={exclusiveContent.all?.content} heading="All users" variation={1} />
+              <HomeBentoBox content={exclusiveContent.standard?.content} variation={2} />
+              <HomeBentoBox content={exclusiveContent.premium?.content} variation={3} />
             </div>
           </div>
 

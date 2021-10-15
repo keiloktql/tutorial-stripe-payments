@@ -145,7 +145,9 @@ const ChangePlan = () => {
                                 <>
                                     <div className="c-Change-plan__Top">
                                         <h1 className="c-Change-plan__Heading">Change Plan</h1>
-                                        <p>Changing to a upgraded plan will incur a prorated charge immediately. <br /> Changing to a downgraded plan will deduct your bill amount at the next bill date.</p>
+                                        <p>Changing of subscription plan during free trial will not incur any charge.<br />
+                                        After free trial, changes to a subscription plan such as upgrading or downgrading can result in prorated charges at your next billing date.
+                                         </p>
                                     </div>
 
                                     <div className="c-Change-plan__Cards">

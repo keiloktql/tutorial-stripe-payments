@@ -59,7 +59,6 @@ const PlansCheckout = ({ match }) => {
     const [paymentProcessing, setPaymentProcessing] = useState(false);
     const [paymentDisabled, setPaymentDisabled] = useState(true);
     const [paymentSuccess, setPaymentSuccess] = useState(false);
-    const [subscriptionID, setSubscriptionID] = useState(null);
     const [clientSecret, setClientSecret] = useState(null);
     const stripe = useStripe();
 
@@ -97,8 +96,7 @@ const PlansCheckout = ({ match }) => {
                     if (liveSubscription) {
                         // User has pending payment for new subscription
                         if (liveSubscription.stripe_status === "incomplete") {
-                            setSubscriptionID(() => liveSubscription.stripe_subscription_id);
-                            setClientSecret(() => liveSubscription.invoice.stripe_client_secret);
+                            setClientSecret(() => liveSubscription.invoice[0].stripe_client_secret);
                         }
                         // User has existing active subscription
                         // active means subscription status aka stripe_status can be:
@@ -120,8 +118,8 @@ const PlansCheckout = ({ match }) => {
                                     'Authorization': `Bearer ${token}`
                                 }
                             });
+                            console.log(subscription);
 
-                            setSubscriptionID(() => subscription.data.subscriptionID);
                             setClientSecret(() => subscription.data.clientSecret);
                         }
                     }
@@ -200,19 +198,23 @@ const PlansCheckout = ({ match }) => {
         } else {
             // If user has already trialed, 
             if (selectedPaymentMethod) {
-                const payload = await stripe.confirmCardPayment(clientSecret, {
-                    payment_method: selectedPaymentMethod
-                });
-
-                if (payload.error) {
-                    // Payment error
-                    setPaymentError(() => `Payment failed! ${payload.error.message}`);
+                try {
+                    const payload = await stripe.confirmCardPayment(clientSecret, {
+                        payment_method: selectedPaymentMethod
+                    });
+                    if (payload.error) {
+                        // Payment error
+                        setPaymentError(() => `Payment failed! ${payload.error.message}`);
+                        setPaymentProcessing(() => false);
+                    } else {
+                        // Payment success
+                        setPaymentError(() => null);
+                        setPaymentProcessing(false);
+                        setPaymentSuccess(() => true);
+                    }
+                } catch (error) {
+                    setPaymentError(() => `Payment failed! Something went wrong`);
                     setPaymentProcessing(() => false);
-                } else {
-                    // Payment success
-                    setPaymentError(() => null);
-                    setPaymentProcessing(false);
-                    setPaymentSuccess(() => true);
                 }
             } else {
                 setPaymentError(() => `Payment failed! No payment method`);

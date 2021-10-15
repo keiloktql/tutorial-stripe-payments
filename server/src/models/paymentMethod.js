@@ -43,6 +43,13 @@ module.exports.updatePaymentMethod = (paymentMethodID, cardFingerprint, cardLast
     }
 });
 
+// Remove Payment method
+module.exports.removePaymentMethod = (paymentMethodID) => PaymentMethods.destroy({
+    where: {
+        stripe_payment_method_id: paymentMethodID
+    }
+})
+
 // Find Payment Method by ID
 module.exports.findPaymentMethod = (paymentMethodID) => PaymentMethods.findOne({
     where: {
@@ -52,7 +59,6 @@ module.exports.findPaymentMethod = (paymentMethodID) => PaymentMethods.findOne({
         model: Accounts,
         as: "payment_methods"
     },
-    order: [['stripe_payment_method_id', 'ASC']]
 });
 
 // Find Duplicate Payment Method

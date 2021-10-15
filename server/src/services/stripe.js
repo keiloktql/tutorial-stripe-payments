@@ -61,7 +61,7 @@ module.exports.createSubscriptionInStripe = (customerID, subscriptionPriceID, me
     price: subscriptionPriceID
   }],
   payment_behavior: 'default_incomplete',
-  proration_behavior: 'always_invoice',
+  proration_behavior: 'create_prorations',
   expand: ['latest_invoice.payment_intent'],
 });
 
@@ -75,7 +75,6 @@ module.exports.updateSubscriptionInStripe = (subscriptionID, meta) => stripe.sub
   subscriptionID,
   {
     ...meta,
-    cancel_at_period_end: false,
   }
 );
 

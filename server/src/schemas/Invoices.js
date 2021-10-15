@@ -44,11 +44,11 @@ const Invoices = db.define(
         },
         stripe_period_start: {
             type: "TIMESTAMP",
-            allowNull: false
+            allowNull: true
         },
         stripe_period_end: {
             type: "TIMESTAMP",
-            allowNull: false
+            allowNull: true
         },
         stripe_payment_method_fingerprint: {
             type: DataTypes.STRING(255),
@@ -66,6 +66,10 @@ const Invoices = db.define(
             type: DataTypes.STRING(255),
             allowNull: true
         },
+        paid_on: {
+            type: "TIMESTAMP",
+            allowNull: true
+        }
     },
     {
         tableName: "invoices",

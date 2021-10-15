@@ -46,14 +46,14 @@ module.exports.checkPremiumAccess = async (req, res, next) => {
 
         // Get active subscription information
         // Active can be: "active, canceling, trialing, past_due"
-        const activeSubscription = findActiveSubscription(accountID);
+        const activeSubscription = await findActiveSubscription(accountID);
 
         if (!activeSubscription) return res.status(403).send({
             message: "No active subscriptions!"
         });
 
         // Allow premium and free trial user access to premum plan 
-        if (activeSubscription.fk_plan_id !== "123" && activeSubscription.stripe_status !== "trialing") return res.status(403).send({
+        if (activeSubscription.fk_plan_id !== 2 && activeSubscription.stripe_status !== "trialing") return res.status(403).send({
             message: "Access only allowed for premium subscribers!"
         });
 
@@ -74,14 +74,14 @@ module.exports.checkStandardAccess = async (req, res, next) => {
 
         // Get active subscription information
         // Active can be: "active, canceling, trialing, past_due"
-        const activeSubscription = findActiveSubscription(accountID);
+        const activeSubscription = await findActiveSubscription(accountID);
 
         if (!activeSubscription) return res.status(403).send({
             message: "No active subscriptions!"
         });
 
-        if (activeSubscription.fk_plan_id !== "321" && activeSubscription.fk_plan_id !== "123") return res.status(403).send({
-            message: "Access only allowed for premium subscribers!"
+        if (activeSubscription.fk_plan_id !== 1 && activeSubscription.fk_plan_id !== 2 ) return res.status(403).send({
+            message: "Access only allowed for standard, premium subscribers and free trial usere!"
         });
 
         return next();

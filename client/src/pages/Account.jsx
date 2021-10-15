@@ -17,6 +17,8 @@ import Chip from '@mui/material/Chip';
 import SelectPaymentMethod from '../common/SelectPaymentMethod';
 import { confirmAlert } from 'react-confirm-alert';
 import CustomConfirmAlert from '../common/CustomConfirmAlert';
+import Alert from 'react-bootstrap/Alert';
+import { useStripe } from "@stripe/react-stripe-js";
 
 const Account = () => {
     const token = getToken();
@@ -25,6 +27,7 @@ const Account = () => {
         const decodedToken = jwt_decode(token);
         accountID = decodedToken.account_id;
     }
+    const stripe = useStripe();
 
     // State declarations
     const [profileData, setProfileData] = useState({
@@ -33,8 +36,7 @@ const Account = () => {
         email: null,
         username: null
     });
-    const [loading, setLoading] = useState(true);
-    const [editMode, setEditMode] = useState(false);
+    const [changePaymentMethodBtnDisabled, setChangePaymentMethodBtnDisabled] = useState(false);
     const [billingHistory, setBillingHistory] = useState([]);
     const [subscriptionInfo, setSubscriptionInfo] = useState(null);
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState(null);
@@ -42,6 +44,7 @@ const Account = () => {
     const [showSetupPaymentMethod, setShowSetupPaymentMethod] = useState(false);
     const [showChangeCard, setShowChangeCard] = useState(false);
     const [rerender, setRerender] = useState(false);
+    const [failedPaymentExist, setFailedPaymentExist] = useState(false);
 
     useEffect(() => {
         let componentMounted = true;
@@ -75,47 +78,14 @@ const Account = () => {
                             cardType: paymentAccount.stripe_card_type,
                             last4: paymentAccount.stripe_card_last_four_digit,
                             expDate: paymentAccount.stripe_card_exp_date,
-                            stripePaymentMethodID: paymentAccount.stripe_payment_method_id,
+                            stripepPaymentMethodID: paymentAccount.stripe_payment_method_id,
                             createdAt: dayjs(new Date(paymentAccount.created_at)).format("MMMM D, YYYY h:mm A"),
+                            action_delete: paymentAccount.stripe_payment_method_id,
                         })));
                     }
 
                     if (activeSubscriptionData.activeSubscription) {
                         const activeSubscription = activeSubscriptionData.activeSubscription;
-
-                        if (activeSubscription.invoice) {
-                            // Set Billing history
-                            setBillingHistory(() => activeSubscription.invoice.map((invoice, index) => ({
-                                invoiceID: invoice.stripe_invoice_id,
-                                invoiceReferenceNumber: invoice.stripe_reference_number,
-                                amount: invoice.amount,
-                                status: (() => {
-                                    const status = invoice.stripe_payment_intent_status;
-                                    if (status === "succeeded") {
-                                        return "Paid";
-                                    } else if (status === "requires_action") {
-                                        return "Requires Action";
-                                    } else if (status === "requires_payment_method") {
-                                        return "Failed";
-                                    } else if (status === "canceled") {
-                                        return "Canceled";
-                                    } else {
-                                        return status;
-                                    }
-                                })(),
-                                cardType: invoice.stripe_card_type,
-                                last4: invoice.stripe_card_last_four_digit,
-                                // todo: Paid at?
-                                action: (() => {
-                                    if (invoice.stripe_payment_intent_status !== "succeeded" && invoice.stripe_payment_intent_status !== "canceled") {
-                                        return true;
-                                    } else {
-                                        return false;
-                                    }
-                                })()
-                            })))
-                        }
-
                         // Subscription info
                         setSubscriptionInfo(() => ({
                             status: activeSubscription.stripe_status,
@@ -135,14 +105,35 @@ const Account = () => {
                                     return null;
                                 }
                             })(),
-                            last4: "●●●● " + activeSubscription.payment_method.stripe_card_last_four_digit,
-                            cardType: activeSubscription.payment_method.stripe_card_type,
-                        }))
-
-                        // Set default payment method
+                            defaultPaymentMethodID: activeSubscription.payment_method?.stripe_payment_method_id,
+                            last4: activeSubscription.payment_method?.stripe_card_last_four_digit,
+                            cardType: activeSubscription.payment_method?.stripe_card_type,
+                        }));
+                        if (activeSubscription.invoice) {
+                            // Set Billing history
+                            setBillingHistory(() => activeSubscription.invoice.map((invoice, index) => ({
+                                invoiceID: invoice.stripe_invoice_id,
+                                invoiceReferenceNumber: invoice.stripe_reference_number,
+                                amount: invoice.amount,
+                                status: invoice.stripe_payment_intent_status,
+                                cardType: invoice.stripe_card_type,
+                                last4: invoice.stripe_card_last_four_digit,
+                                clientSecret: invoice.stripe_client_secret,
+                                action: (() => {
+                                    console.log(invoice.stripe_payment_intent_status);
+                                    if (invoice.stripe_payment_intent_status !== "succeeded" && invoice.stripe_payment_intent_status !== "canceled") {
+                                        setFailedPaymentExist(() => true);
+                                        return true;
+                                    } else {
+                                        setFailedPaymentExist(() => false);
+                                        return false;
+                                    }
+                                })(),
+                                paidOn: dayjs(new Date(invoice.paid_on)).format("MMMM D, YYYY h:mm A")
+                            })));
+                        }
                     }
 
-                    setLoading(() => false);
                 }
 
             } catch (error) {
@@ -154,7 +145,6 @@ const Account = () => {
                         email: "Error",
                         username: "Error"
                     }));
-                    setLoading(() => false);
                 }
             }
 
@@ -164,6 +154,26 @@ const Account = () => {
             componentMounted = false;
         });
     }, [rerender]);
+
+    useEffect(() => {
+        console.log(subscriptionInfo);
+        console.log(selectedPaymentMethod);
+        if (selectedPaymentMethod) {
+            console.log(subscriptionInfo?.defaultPaymentMethodID);
+
+            console.log(subscriptionInfo?.selectedPaymentMethod);
+
+            if (subscriptionInfo?.defaultPaymentMethodID === selectedPaymentMethod) {
+                setChangePaymentMethodBtnDisabled(() => true);
+            } else {
+                console.log("ran");
+                setChangePaymentMethodBtnDisabled(() => false);
+            }
+        } else {
+            setChangePaymentMethodBtnDisabled(() => true);
+        }
+
+    }, [selectedPaymentMethod]);
 
     const billingHistoryColumn = [
         {
@@ -182,13 +192,13 @@ const Account = () => {
             }
         },
         {
-            dataField: 'status',
-            text: 'Status',
-        },
-        {
             dataField: 'cardType',
             text: 'Card Type',
             formatter: (cell, row) => {
+                if (!cell) {
+                    return "N.a."
+                }
+
                 if (cell === "visa") {
                     return <ReactSVG
                         src={visaSVG}
@@ -212,20 +222,55 @@ const Account = () => {
         {
             dataField: 'last4',
             text: 'Last 4 Digit',
-            formatter: (cell) => (
-                "●●●● " + cell
-            )
+            formatter: (cell) => {
+                if (cell) {
+                    return "●●●● " + cell
+                } else {
+                    return "N.a."
+                }
+            }
         },
         {
-            dataField: 'createdAt',
-            text: 'Paid on'
+            dataField: 'paidOn',
+            text: 'Paid on',
+            formatter: (cell) => {
+                if (cell) {
+                    return cell
+                } else {
+                    return "N.a."
+                }
+            }
+        },
+        {
+            dataField: 'status',
+            text: 'Status',
+            formatter: (cell) => {
+                if (cell === "succeeded") {
+                    return <Chip label="Paid" color="success" size="small" />
+                } else if (cell === "requires_action") {
+                    return <Chip label="Requires Action" color="error" size="small" />
+                } else if (cell === "requires_payment_method") {
+                    return <Chip label="Failed" size="small" color="error" />
+                } else if (cell === "canceled") {
+                    return <Chip label="Canceled" size="small" />
+                } else {
+                    return cell;
+                }
+            }
+        },
+        {
+            dataField: 'clientSecret',
+            text: '',
+            hidden: true
         },
         {
             dataField: 'action',
             text: '',
             formatter: (cell, row) => {
+                console.log(subscriptionInfo);
+                console.log(billingHistory);
                 if (cell) {
-                    return <button type="button" className = "c-Btn c-Btn--empty">Pay Now</button>
+                    return <button type="button" className="c-Btn c-Btn--link" onClick={() => handleFailedPayment(row.clientSecret)}>Pay Now</button>
                 } else {
                     return null;
                 }
@@ -233,11 +278,6 @@ const Account = () => {
         }
     ];
     const paymentMethodsColumn = [
-        {
-            dataField: 'paymentMethodID',
-            text: 'Id',
-            hidden: true
-        },
         {
             dataField: 'serialNo',
             text: '#',
@@ -284,9 +324,8 @@ const Account = () => {
         {
             dataField: 'action_delete',
             text: '',
-            isDummyField: true,
-            formatter: (cell, row) => {
-                return <p onClick={() => handleRemoveCard(row.paymentMethodID)}>Remove Card</p>
+            formatter: (cell) => {
+                return <p onClick={() => handleRemoveCard(cell)}>Remove Card</p>
             }
         }
     ];
@@ -339,12 +378,57 @@ const Account = () => {
             }
         });
 
-        const executeRemoveCard = (onClose) => {
-
+        const executeRemoveCard = async (onClose) => {
+            console.log(paymentMethodID);
+            try {
+                await axios.delete(`${config.baseUrl}/stripe/payment_methods/${paymentMethodID}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                toast.success("Card has been successfully detached!");
+                setRerender((prevState) => !prevState)
+            } catch (error) {
+                toast.error("Something went wrong!");
+                console.log(error);
+            }
+            onClose();
         }
     };
 
     // Subscription handlers
+    // Handle user submit failed payment
+    const handleFailedPayment = async (clientSecret) => {
+
+        if (!stripe) {
+            // Stripe.js has not yet loaded.
+            // Make sure to disable form submission until Stripe.js has loaded.
+            toast.error("Something went wrong");
+            return;
+        }
+
+        if (!subscriptionInfo?.defaultPaymentMethodID) {
+            toast.error("Error! No default payment method for card!");
+        } else {
+            try {
+                const payload = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: subscriptionInfo.defaultPaymentMethodID
+                });
+                if (payload.error) {
+                    console.log(payload.error);
+                    // Payment error
+                    toast.error(`Payment failed! ${payload.error.message}`);
+                } else {
+                    // Payment success
+                    toast.success("Payment Success!");
+                    setRerender((prevState) => !prevState);
+                }
+            } catch (error) {
+                console.log(error);
+                toast.error("Payment failed! Something went wrong");
+            }
+        }
+    }
 
     const handleCancelSubscription = () => {
         let message = "Click confirm to proceed.";
@@ -374,6 +458,7 @@ const Account = () => {
                 });
                 onClose();
                 toast.success("Successfully cancelled subscription!");
+                setRerender((prevState) => !prevState);
             } catch (error) {
                 console.log(error);
                 let errCode = "Error!";
@@ -394,7 +479,33 @@ const Account = () => {
         };
     };
 
-    const handleChangeSubscriptionPaymentMethod = () => {
+    // Change subscription payment method
+    const handleChangeSubscriptionPaymentMethod = async () => {
+        if (selectedPaymentMethod) {
+            // Prevent changing to same card
+            if (subscriptionInfo?.defaultPaymentMethodID === selectedPaymentMethod) {
+                toast.error("Error! No changing to same card!");
+            } else {
+                try {
+                    await axios.put(`${config.baseUrl}/stripe/subscriptions`, {
+                        paymentMethodID: selectedPaymentMethod
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    toast.success("Payment method changed successfully");
+                    setSelectedPaymentMethod(() => null);
+                    setShowChangeCard((prevState) => !prevState);
+                    setRerender((prevState) => !prevState); // tell application to rerender and run useEffect
+                } catch (error) {
+                    console.log(error);
+                    toast.error("Error! Try again later!");
+                }
+            }
+        } else {
+            toast.error("Error! No payment method selected!");
+        }
 
     };
 
@@ -491,8 +602,8 @@ const Account = () => {
                                         }
                                         {
                                             subscriptionInfo?.status === "canceling" ?
-                                            <p>Subscription is canceling at the end of the billing cycle.</p> :
-                                            null
+                                                <p>Subscription will be canceled at the end of the billing cycle.</p> :
+                                                null
                                         }
 
                                         <div className="c-Subscription__Info c-Info">
@@ -511,57 +622,90 @@ const Account = () => {
                                                 }
                                             </div>
                                             <div className="c-Info__Btns">
-                                                <NavLink to="/plans/change" className="c-Btn c-Btn--stripe-purple">Change Plan</NavLink>
-                                                <button type="button" onClick={handleCancelSubscription} className="c-Btn c-Btn--stripe-purple-border">Cancel Subscription</button>
-                                            </div>
-                                        </div>
-                                    </div><div className="l-Subscription__Payment-method">
-                                        <div className="c-Subscription__Payment-method c-Payment-method">
-                                            <h2>Payment Method</h2>
-                                            <hr />
-                                            <div className="c-Payment-method__Top">
-                                                <div className="c-Payment-method__Left">
-                                                    <div className="c-Left__Info">
-                                                        {renderCardLogo(subscriptionInfo?.cardType)}
-                                                        <p>●●●● {subscriptionInfo?.last4}</p>
-                                                    </div>
-                                                </div>
-                                                <div className="c-Payment-method__Right">
-                                                    {showChangeCard ?
+                                                {
+                                                    subscriptionInfo.status === 'canceling' ?
                                                         null :
-                                                        <button type="button" className="c-Btn c-Btn--stripe-purple-border" onClick={handleShowChangeCard}>Change Card</button>}
+                                                        <>
+                                                            <button type="button" onClick={handleCancelSubscription} className="c-Btn c-Btn--stripe-purple-border">Cancel Subscription</button>
+                                                            <NavLink to="/plans/change" className="c-Btn c-Btn--stripe-purple">Change Plan</NavLink>
+                                                        </>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {
+                                        subscriptionInfo.status === 'canceling' ?
+                                            null :
+                                            <div className="l-Subscription__Payment-method">
+                                                <div className="c-Subscription__Payment-method c-Payment-method">
+                                                    <h2>Payment Method</h2>
+                                                    <p>Card will be charged automatically every month!</p>
+                                                    <hr />
+                                                    <div className="c-Payment-method__Top">
+                                                        {
+                                                            subscriptionInfo?.defaultPaymentMethodID ?
+                                                                <>
+                                                                    <div className="c-Payment-method__Left">
+                                                                        <div className="c-Left__Info">
+                                                                            {renderCardLogo(subscriptionInfo?.cardType)}
+                                                                            <p>●●●● {subscriptionInfo?.last4}</p>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="c-Payment-method__Right">
+                                                                        {
+                                                                            paymentMethods.length > 0 ?
+                                                                                showChangeCard ?
+                                                                                    null :
+                                                                                    <button type="button" className="c-Btn c-Btn--stripe-purple-border" onClick={handleShowChangeCard}>Change Card</button> :
+                                                                                null
+                                                                        }
+                                                                    </div>
+                                                                </>
+                                                                :
+                                                                <>
+                                                                    <div className="c-Payment-method__Left">
+                                                                        <p>No payment method.</p>
+                                                                    </div>
+                                                                    <div className="c-Payment-method__Right">
+                                                                        <button type="button" className="c-Btn c-Btn--stripe-purple-border" onClick={handleShowChangeCard}>Add Card</button>
+                                                                    </div>
+                                                                </>
+                                                        }
+
+                                                    </div>
+                                                    {showChangeCard ?
+                                                        <>
+                                                            <hr />
+                                                            <div className="c-Payment-method__Change c-Change">
+                                                                <h1>{subscriptionInfo?.defaultPaymentMethodID ? "Change" : "Add"} Payment Method</h1>
+                                                                {paymentMethods.length > 0 ?
+                                                                    paymentMethods.map((paymentMethod, index) => (
+                                                                        <div className="c-Change__Payment-methods" key={index}>
+                                                                            <SelectPaymentMethod
+                                                                                index={index}
+                                                                                cardBrand={paymentMethod.cardType}
+                                                                                last4={paymentMethod.last4}
+                                                                                expDate={paymentMethod.expDate}
+                                                                                stripePaymentMethodID={paymentMethod.stripepPaymentMethodID}
+                                                                                selectedPaymentMethod={selectedPaymentMethod}
+                                                                                handleSelectPaymentMethod={handleSelectPaymentMethod} />
+                                                                        </div>
+                                                                    ))
+                                                                    :
+                                                                    <p>No payment methods found.</p>}
+                                                                <div className="c-Change__Btns">
+                                                                    <button type="button" disabled={changePaymentMethodBtnDisabled} className="c-Btn c-Btn--stripe-purple" onClick={handleChangeSubscriptionPaymentMethod}>Save</button>
+                                                                    <button type="button" className="c-Btn c-Btn--empty" onClick={handleShowChangeCard}>Cancel</button>
+                                                                </div>
+                                                            </div>
+                                                        </>
+                                                        :
+                                                        null}
                                                 </div>
                                             </div>
-                                            {showChangeCard ?
-                                                <>
-                                                    <hr />
-                                                    <div className="c-Payment-method__Change c-Change">
-                                                        <h1>Change Payment Method</h1>
-                                                        {paymentMethods.length > 0 ?
-                                                            paymentMethods.map((paymentMethod, index) => (
-                                                                <div className="c-Change__Payment-methods" key={index}>
-                                                                    <SelectPaymentMethod
-                                                                        index={index}
-                                                                        cardBrand={paymentMethod.cardType}
-                                                                        last4={paymentMethod.last4}
-                                                                        expDate={paymentMethod.expDate}
-                                                                        stripePaymentMethodID={paymentMethod.stripePaymentMethodID}
-                                                                        selectedPaymentMethod={selectedPaymentMethod}
-                                                                        handleSelectPaymentMethod={handleSelectPaymentMethod} />
-                                                                </div>
-                                                            ))
-                                                            :
-                                                            <p>No payment methods found.</p>}
-                                                        <div className="c-Change__Btns">
-                                                            <button type="button" className="c-Btn c-Btn--stripe-purple">Save</button>
-                                                            <button type="button" className="c-Btn c-Btn--empty" onClick={handleShowChangeCard}>Cancel</button>
-                                                        </div>
-                                                    </div>
-                                                </>
-                                                :
-                                                null}
-                                        </div>
-                                    </div></>
+                                    }
+
+                                </>
                                 :
                                 <div className="l-Subscription__No-subscription c-No-subscription">
                                     <p>No Subscription Plan.</p>
@@ -572,16 +716,25 @@ const Account = () => {
                             <h2>Billing History</h2>
                             <hr />
                             {
+                                failedPaymentExist ?
+                                    <>
+                                        <Alert variant="warning" className="c-Billing-history__Warning">
+                                            <Alert.Heading><b>Important!</b></Alert.Heading>
+                                            You have a payment error, please try payment manually again or change payment method. Your subscription will be canceled on if you do not pay the bill by __.
+                                        </Alert>
+                                    </> :
+                                    null
+                            }
+                            {
                                 billingHistory.length === 0 ?
                                     <p>No Billing History Found!</p>
                                     :
                                     <>
                                         {/* Billing history table */}
-
                                         <div className="c-Billing-history__Table">
                                             <BootstrapTable
                                                 bordered={false}
-                                                keyField="serialNo"
+                                                keyField="invoiceReferenceNumber"
                                                 data={billingHistory}
                                                 columns={billingHistoryColumn}
                                             />

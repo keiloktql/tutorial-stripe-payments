@@ -65,4 +65,10 @@
         cursor: not-allowed !important;
         opacity: 0.7;
     }
+
+    &--link {
+        background-color: transparent;
+        color: $stripe-purple;
+        padding: 0;
+    }
 }

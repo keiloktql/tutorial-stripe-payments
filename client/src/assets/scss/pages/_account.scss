@@ -353,8 +353,11 @@
         }
 
         .c-Billing-history {
+            &__Warning {
+                max-width: 800px;
+            }
             &__Table {
-                
+
                 .c-SVG__Visa {
                     svg {
                         width: 30.799px;
