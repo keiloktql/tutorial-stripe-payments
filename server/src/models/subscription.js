@@ -45,7 +45,8 @@ module.exports.findLiveSubscription = (accountID) => Subscriptions.findOne({
         as: "plan"
     }, {
         model: Invoices,
-        as: "invoice"
+        as: "invoice",
+        order: [['paid_on', 'DESC']]
     }, {
         model: PaymentMethods,
         as: "payment_method"
@@ -64,10 +65,11 @@ module.exports.findActiveSubscription = (accountID) => Subscriptions.findOne({
     },
     include: [{
         model: Plans,
-        as: "plan"
+        as: "plan",
     }, {
         model: Invoices,
-        as: "invoice"
+        as: "invoice",
+        order: [['paid_on', 'DESC']]
     }, {
         model: PaymentMethods,
         as: "payment_method"
@@ -81,6 +83,7 @@ module.exports.findSubscriptionsByAccountID = (accountID) => Subscriptions.findA
     },
     include: [{
         model: Invoices,
-        as: "invoice"
+        as: "invoice",
+        order: [['paid_on', 'DESC']]
     }]
 });

@@ -30,6 +30,10 @@ const Invoices = db.define(
             type: DataTypes.ENUM(["succeeded", "requires_payment_method", "requires_action", "canceled", "incomplete"]),
             allowNull: true
         },
+        balance: {
+            type: DataTypes.DECIMAL(10,2),
+            allowNull: true,
+        },
         amount: {
             type: DataTypes.STRING(255),
             allowNull: true,

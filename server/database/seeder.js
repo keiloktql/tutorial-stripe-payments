@@ -26,6 +26,7 @@ module.exports.seeder = async () => {
                 username,
                 email,
                 trialed: false,
+                balance: 0,
                 passwords: [{
                     password: bcrypt.hashSync("123", 10)
                 }],

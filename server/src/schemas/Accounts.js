@@ -24,6 +24,10 @@ const Accounts = db.define(
             type: DataTypes.BOOLEAN,
             allowNull: false
         },
+        balance: {
+            type: DataTypes.DECIMAL(10,2),
+            allowNull: true,
+        },
         // Stripe
         stripe_customer_id: {
             type: DataTypes.STRING(255),

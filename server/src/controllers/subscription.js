@@ -11,7 +11,6 @@ module.exports.findActiveSubscription = async (req, res) => {
         });
 
         const activeSubscription = await findActiveSubscription(accountID);
-
         if (!activeSubscription) return res.status(204).send();
 
         return res.status(200).send({ activeSubscription });

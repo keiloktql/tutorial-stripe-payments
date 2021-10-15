@@ -351,8 +351,9 @@ module.exports.updateSubscription = async (req, res) => {
                     id: subscription.items.data[0].id,
                     price: priceID
                 }],
-                proration_behavior: "always_invoice"
+                proration_behavior: "always_invoice" // tell stripe to invoice and charge immediately
             });
+
 
             // Update subscription in our database
             const planID = plan.plan_id;
@@ -451,6 +452,19 @@ module.exports.handleWebhook = async (req, res) => {
 
         // Types of events: https://stripe.com/docs/api/events/types
         switch (event.type) {
+            case 'customer.updated': {
+                const customer = event.data.object;
+
+                const customerID = customer.id;
+
+                // Find accoutn by customer id
+                const account = await findAccountByStripeCustID(customerID);
+                await updateAccountByID(account.account_id, {
+                    balance: parseFloat(customer.balance / 100).toFixed(2)
+                });
+
+                break;
+            }
 
             // This case is only applicable for one time payment
             case 'payment_intent.succeeded': {
@@ -500,11 +514,17 @@ module.exports.handleWebhook = async (req, res) => {
                     await updateAccountByID(accountID, {
                         trialed: true
                     });
-                } else {   
+                } else {
                     const subscriptionID = invoice.subscription;
-                    // Ensure that invoice is debit, not credit
+                    const amount = parseFloat(invoice.amount_paid / 100).toFixed(2);
+
+                    // billing cycle
+                    const currentPeriodStart = dayjs(invoice.period_start * 1000).toDate();
+                    const currentPeriodEnd = dayjs(invoice.period_end * 1000).toDate();
+
+                    // Charged with a payment method
                     if (invoice.payment_intent) {
-                     
+
                         const paymentIntentID = invoice.payment_intent;
 
                         const paymentIntent = await findPaymentIntent(paymentIntentID);
@@ -521,13 +541,6 @@ module.exports.handleWebhook = async (req, res) => {
                             await updateSubscription(subscriptionID, { fk_payment_method: paymentMethodID });
 
                         }
-
-                        // Find plan based on price id
-                        const amount = parseFloat(invoice.amount_paid / 100).toFixed(2);
-
-                        // billing cycle
-                        const currentPeriodStart = dayjs(invoice.period_start).toDate();
-                        const currentPeriodEnd = dayjs(invoice.period_end).toDate();
 
                         // Payment method information
                         const cardFingerprint = paymentMethod.card.fingerprint;
@@ -546,6 +559,7 @@ module.exports.handleWebhook = async (req, res) => {
                                 stripe_payment_intent_status: 'succeeded',
                                 stripe_reference_number: invoice.number,
                                 amount,
+                                balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                 fk_stripe_subscription_id: subscriptionID,
                                 stripe_period_start: currentPeriodStart,
                                 stripe_period_end: currentPeriodEnd,
@@ -565,6 +579,7 @@ module.exports.handleWebhook = async (req, res) => {
                                 stripe_client_secret: clientSecret,
                                 stripe_payment_intent_status: 'succeeded',
                                 amount,
+                                balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                 fk_stripe_subscription_id: subscriptionID,
                                 stripe_period_start: currentPeriodStart,
                                 stripe_period_end: currentPeriodEnd,
@@ -575,7 +590,39 @@ module.exports.handleWebhook = async (req, res) => {
                                 paid_on: new Date()
                             });
                         }
-                    } 
+                    } else {
+                        // Credited/debited with account credits/debts
+                        // Credited/debited with account credits/debts
+                        // Check if invoice exists in our Database already
+                        const invoiceExists = await findInvoice(invoice.id);
+
+                        if (invoiceExists) {
+                            // Update invoice
+                            await updateInvoice(invoice.id, {
+                                stripe_payment_intent_status: 'succeeded',
+                                stripe_reference_number: invoice.number,
+                                amount,
+                                balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
+                                fk_stripe_subscription_id: subscriptionID,
+                                stripe_period_start: currentPeriodStart,
+                                stripe_period_end: currentPeriodEnd,
+                                paid_on: new Date()
+                            });
+                        } else {
+                            // Insert invoice
+                            await createInvoice({
+                                stripe_invoice_id: invoice.id,
+                                stripe_reference_number: invoice.number,
+                                stripe_payment_intent_status: 'succeeded',
+                                amount,
+                                balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
+                                fk_stripe_subscription_id: subscriptionID,
+                                stripe_period_start: currentPeriodStart,
+                                stripe_period_end: currentPeriodEnd,
+                                paid_on: new Date()
+                            });
+                        }
+                    }
                 }
 
                 // Send email to user
@@ -609,6 +656,7 @@ module.exports.handleWebhook = async (req, res) => {
                                 await updateInvoice(latestInvoiceID, {
                                     stripe_payment_intent_status: 'canceled',
                                     amount,
+                                    balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                     fk_stripe_subscription_id: subscriptionID,
                                     stripe_period_start: currentPeriodStart,
                                     stripe_period_end: currentPeriodEnd
@@ -619,6 +667,7 @@ module.exports.handleWebhook = async (req, res) => {
                                     stripe_invoice_id: latestInvoiceID,
                                     stripe_payment_intent_status: 'canceled',
                                     amount,
+                                    balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                     fk_stripe_subscription_id: subscriptionID,
                                     stripe_period_start: currentPeriodStart,
                                     stripe_period_end: currentPeriodEnd
@@ -654,8 +703,8 @@ module.exports.handleWebhook = async (req, res) => {
 
                 // Find plan based on price id
                 const amount = parseFloat(invoice.amount_due / 100).toFixed(2);
-                const currentPeriodStart = dayjs(invoice.period_start).toDate();
-                const currentPeriodEnd = dayjs(invoice.period_end).toDate();
+                const currentPeriodStart = dayjs(invoice.period_start * 1000).toDate();
+                const currentPeriodEnd = dayjs(invoice.period_end * 1000).toDate();
 
                 // Check if invoice exists in our Database already
                 const invoiceExists = await findInvoice(invoice.id);
@@ -665,6 +714,7 @@ module.exports.handleWebhook = async (req, res) => {
                         stripe_payment_intent_status: 'requires_payment_method',
                         stripe_reference_number: invoice.number,
                         amount,
+                        balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                         fk_stripe_subscription_id: subscriptionID,
                         stripe_period_start: currentPeriodStart,
                         stripe_period_end: currentPeriodEnd
@@ -682,6 +732,7 @@ module.exports.handleWebhook = async (req, res) => {
                         stripe_client_secret: clientSecret,
                         stripe_payment_intent_status: 'requires_payment_method',
                         amount,
+                        balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                         fk_stripe_subscription_id: subscriptionID,
                         stripe_period_start: currentPeriodStart,
                         stripe_period_end: currentPeriodEnd
@@ -701,8 +752,8 @@ module.exports.handleWebhook = async (req, res) => {
                 // failed and to retrieve new card details.
 
                 const amount = parseFloat(invoice.amount_due / 100).toFixed(2);
-                const currentPeriodStart = dayjs(invoice.period_start).toDate();
-                const currentPeriodEnd = dayjs(invoice.period_end).toDate();
+                const currentPeriodStart = dayjs(invoice.period_start * 1000).toDate();
+                const currentPeriodEnd = dayjs(invoice.period_end * 1000).toDate();
 
                 // Check if invoice exists in our Database already
                 const invoiceExists = await findInvoice(invoice.id);
@@ -712,6 +763,7 @@ module.exports.handleWebhook = async (req, res) => {
                         stripe_payment_intent_status: 'requires_action',
                         stripe_reference_number: invoice.number,
                         amount,
+                        balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                         fk_stripe_subscription_id: subscriptionID,
                         stripe_period_start: currentPeriodStart,
                         stripe_period_end: currentPeriodEnd
@@ -729,6 +781,7 @@ module.exports.handleWebhook = async (req, res) => {
                         stripe_client_secret: clientSecret,
                         stripe_payment_intent_status: 'requires_action',
                         amount,
+                        balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                         fk_stripe_subscription_id: subscriptionID,
                         stripe_period_start: currentPeriodStart,
                         stripe_period_end: currentPeriodEnd

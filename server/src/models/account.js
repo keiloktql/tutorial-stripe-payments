@@ -16,6 +16,7 @@ module.exports.createAccount = (username, email, password, stripeCustomerID) => 
     username,
     email,
     trialed: false,
+    balance: 0,
     passwords: [{
         password
     }],

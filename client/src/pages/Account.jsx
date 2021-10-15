@@ -31,10 +31,10 @@ const Account = () => {
 
     // State declarations
     const [profileData, setProfileData] = useState({
-        firstName: null,
-        lastName: null,
         email: null,
-        username: null
+        username: null,
+        displayBalance: null,
+        realBalance: null
     });
     const [changePaymentMethodBtnDisabled, setChangePaymentMethodBtnDisabled] = useState(false);
     const [billingHistory, setBillingHistory] = useState([]);
@@ -71,7 +71,9 @@ const Account = () => {
                     if (accountData.account) {
                         setProfileData(() => ({
                             email: accountData.account.email,
-                            username: accountData.account.username
+                            username: accountData.account.username,
+                            displayBalance: "S$" + Math.abs(parseFloat(accountData.account.balance)).toFixed(2),
+                            realBalance: parseFloat(accountData.account.balance).toFixed(2)
                         }));
                         setPaymentMethods(() => accountData.account.payment_accounts.map((paymentAccount, index) => ({
                             serialNo: index + 1,
@@ -113,6 +115,7 @@ const Account = () => {
                             // Set Billing history
                             setBillingHistory(() => activeSubscription.invoice.map((invoice, index) => ({
                                 invoiceID: invoice.stripe_invoice_id,
+                                accountBalance: invoice.balance,
                                 invoiceReferenceNumber: invoice.stripe_reference_number,
                                 amount: invoice.amount,
                                 status: invoice.stripe_payment_intent_status,
@@ -129,7 +132,13 @@ const Account = () => {
                                         return false;
                                     }
                                 })(),
-                                paidOn: dayjs(new Date(invoice.paid_on)).format("MMMM D, YYYY h:mm A")
+                                paidOn: (() => {
+                                    if (invoice.paid_on) {
+                                        return dayjs(new Date(invoice.paid_on)).format("MMMM D, YYYY h:mm A");
+                                    } else {
+                                        return null;
+                                    }
+                                })()
                             })));
                         }
                     }
@@ -179,6 +188,13 @@ const Account = () => {
         {
             dataField: 'invoiceReferenceNumber',
             text: 'Reference Number',
+            formatter: (cell) => {
+                if (cell) {
+                    return cell
+                } else {
+                    return "N.a."
+                }
+            }
         },
         {
             dataField: 'amount',
@@ -187,9 +203,27 @@ const Account = () => {
                 if (cell) {
                     return <p>S${cell}</p>
                 } else {
-                    return null;
+                    return "N.a.";
                 }
             }
+        },
+        {
+            dataField: 'accountBalance',
+            text: 'Account Balance',
+            formatter: (cell, row) => {
+                if (cell) {
+                    if (parseFloat(cell) <= 0) {
+                        // Negative values are treated as a credit (a reduction in the amount owed by the customer) that you can apply to the next invoice.
+                        // Positive values are treated as a debit (an increase in the amount owed by the customer to you) that you can apply to the next invoice.
+                        return <p>S${Math.abs(parseFloat(cell)).toFixed(2)} Credit</p>
+                    } else {
+                        return <p>S${Math.abs(parseFloat(cell)).toFixed(2)} Debit</p>
+                    }
+                    
+                } else {
+                    return "N.a."
+                }
+            } 
         },
         {
             dataField: 'cardType',
@@ -605,8 +639,17 @@ const Account = () => {
                                                 <p>Subscription will be canceled at the end of the billing cycle.</p> :
                                                 null
                                         }
+                                        {
+
+                                        }
+
+                                        {/* Account balance */}
+                                        <div className="c-Subscription__Balance">
+                                            <p>Credits are given when downgrading plans. If you have credit/debit in your account, it will be applied in your next invoice.</p>
+                                        </div>
 
                                         <div className="c-Subscription__Info c-Info">
+                                            {/* Current plan */}
                                             <div className="c-Info__Card">
                                                 <h2>Current Plan</h2>
                                                 <h3>{subscriptionInfo?.plan}</h3>
@@ -621,6 +664,13 @@ const Account = () => {
                                                         <Chip className="c-Info__Card-chip" label="Active" color="success" />
                                                 }
                                             </div>
+                                            {/* Account balance */}
+                                            <div className="c-Info__Card">
+                                                <h2>Account Balance</h2>
+                                                <h3>{profileData?.displayBalance}</h3>
+                                                <p>{profileData?.realBalance <= 0 ? "Credit" : "Debit"}</p>
+                                            </div>
+
                                             <div className="c-Info__Btns">
                                                 {
                                                     subscriptionInfo.status === 'canceling' ?
