@@ -147,8 +147,7 @@ const ChangePlan = () => {
                                         <h1 className="c-Change-plan__Heading">Change Plan</h1>
                                         <p>Changing of subscription plan during free trial will not incur any charge.<br />
                                         After free trial, upgrading a subscription will incur a prorated charge immediately.<br/>
-                                        Downgrading subscription will result in credits to your account balance which will be applied in your next billing date.<br/>
-                                        For example, if a customer signs up on May 1 for a $100 price, she'll be billed $100 immediately. If on May 15 she switches to a $200 price, then on June 1 she'll be billed $250 ($200 for a renewal of her subscription, plus a $50 prorating adjustment for half of the previous month's $100 difference). Similarly, a downgrade will generate a credit to be applied to the next invoice.
+                                        Downgrading subscription will result in credits to your account balance which will be applied in your next billing date.
                                          </p>
                                     </div>
 

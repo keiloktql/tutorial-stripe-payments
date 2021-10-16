@@ -4,11 +4,19 @@ This system is a simple user management system with subscription plans and one t
 
 # Project Set Up
 
-_not ready_
-
 ## Stripe
 
-- Ensure account has been set up
+- Setup account on Stripe
+- Setup webhook events, you should listen to the following 8 events
+  - customer.subscription.updated
+  - customer.updated
+  - invoice.paid
+  - invoice.payment_action_required
+  - invoice.payment_failed
+  - payment_intent.succeeded
+  - payment_method.automatically_updated
+  - payment_method.card_automatically_updated
+- Refer to the pdf guide found in docs folder to find out what are webhooks and how to set up webhooks
 
 ## Client
 
@@ -53,3 +61,11 @@ const reset = true;
 
 - Next, start the server
 - Upon completion of the seeding process, set reset to false to prevent table drop and seeding of new data when starting the server again
+
+## ngrok
+- ngrok will be required to connect your local development server to the internet
+- Connecting the server to the internet will enable us to listen to webhook events emitted by Stripe
+- Download ngrok
+- Sign up for an account on ngrok
+- Open up command prompt/terminal 
+- run ``ngrok http 4242`` to listen to the server
