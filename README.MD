@@ -2,6 +2,8 @@
 
 This system is a simple user management system with subscription plans and one time payment.
 
+![](https://raw.githubusercontent.com/keilokimnida/tutorial-stripe-payments/main/screenshots/Deluxe_Home.png)
+
 # Project Set Up
 
 ## Stripe
