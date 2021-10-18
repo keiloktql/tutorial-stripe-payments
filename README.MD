@@ -17,7 +17,6 @@ This system is a simple user management system with subscription plans and one t
   - invoice.payment_failed
   - payment_intent.succeeded
   - payment_method.automatically_updated
-  - payment_method.card_automatically_updated
 - Refer to the pdf guide found in docs folder to find out what are webhooks and how to set up webhooks
 
 ## Client
