@@ -137,6 +137,8 @@ const SetupPaymentMethod = ({ show, handleClose, setRerender }) => {
             elements.getElement(CardElement).clear();
         }
         handleClose();
+        setCardSetupSuccess(() => false);
+        setCardSetupProcessing(() => false);
     };
 
     const handleCardInputChange = async (event) => {
