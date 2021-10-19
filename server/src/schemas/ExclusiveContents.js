@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 const db = require("../config/connection");
 
 const ExclusiveContents = db.define(
-    "ExclusiveContents",
+    "exclusive_contents",
     {
         exclusive_content_id: {
             type: DataTypes.INTEGER.UNSIGNED,
