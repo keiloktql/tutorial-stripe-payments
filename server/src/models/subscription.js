@@ -32,7 +32,7 @@ module.exports.deleteSubscription = (subscriptionID) => Subscriptions.destroy({
 
 // Find live subscriptions
 // live means subscription status aka stripe_status can be: 
-// 'incomplete', 'active', 'trialing', 'past_due'
+// 'incomplete', 'active', 'trialing', 'past_due', 'canceling'
 module.exports.findLiveSubscription = (accountID) => Subscriptions.findOne({
     where: {
         fk_account_id: accountID,

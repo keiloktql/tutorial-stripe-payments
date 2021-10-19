@@ -1,7 +1,7 @@
 const { Subscription, findActiveSubscription, findLiveSubscription } = require('../models/subscription');
 
 // active means 'subscription status' / 'stripe_status' can be:
-// 'active', 'trialing', 'past_due'
+// 'active', 'trialing', 'past_due', 'canceling'
 module.exports.findActiveSubscription = async (req, res) => {
     try {
         const { decoded } = res.locals.auth;
@@ -22,7 +22,7 @@ module.exports.findActiveSubscription = async (req, res) => {
 }
 
 // live means 'subscription status' / 'stripe_status' can be: 
-// 'incomplete', 'active', 'trialing', 'past_due'
+// 'incomplete', 'active', 'trialing', 'past_due', 'canceling'
 module.exports.findLiveSubscription = async (req, res) => {
     try {
         const { decoded } = res.locals.auth;

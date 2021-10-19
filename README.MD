@@ -9,7 +9,10 @@ This system is a simple user management system with subscription plans and one t
 ## Stripe
 
 - Setup account on Stripe
-- Setup webhook events, you should listen to the following 8 events
+- Next, Skip the next step and proceed to Client Section for more instructions for now
+- Come back here after setting up your ngrok connection
+- Setup webhook events using your ngrok URL
+- You should listen to the following 8 events
   - customer.subscription.updated
   - customer.updated
   - invoice.paid
@@ -17,7 +20,7 @@ This system is a simple user management system with subscription plans and one t
   - invoice.payment_failed
   - payment_intent.succeeded
   - payment_method.automatically_updated
-- Refer to the pdf guide found in docs folder to find out what are webhooks and how to set up webhooks
+- Refer to the pdf guide found in docs folder to find out what webhooks are and how to set up webhooks
 
 ## Client
 
@@ -68,5 +71,10 @@ const reset = true;
 - Connecting the server to the internet will enable us to listen to webhook events emitted by Stripe
 - Download ngrok
 - Sign up for an account on ngrok
-- Open up command prompt/terminal 
-- run ``ngrok http 4242`` to listen to the server
+- Login to ngrok on the website and navigate to 'Setup and Installation' page
+- Copy the command that looks something like this ``ngrok authtoken {{TOKEN}}``
+- Open up command prompt/terminal
+- Paste ``ngrok authtoken {{TOKEN}}`` and run the server
+- From now on, you would not need to rerun ``ngrok authtoken {{TOKEN}}`` again to relogin
+- Run ``ngrok http 4242`` to listen to the server
+- Return to Stripe section at the top to continue setting up your webhooks

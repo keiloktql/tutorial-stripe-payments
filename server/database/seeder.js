@@ -12,7 +12,6 @@ const bcrypt = require("bcryptjs");
 const chalk = require('chalk');
 const { ExclusiveContents } = require("../src/schemas/ExclusiveContents");
 
-
 module.exports.seeder = async () => {
     try {
         
