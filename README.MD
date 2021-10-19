@@ -9,7 +9,7 @@ This system is a simple user management system with subscription plans and one t
 ## Stripe
 
 - Setup account on Stripe
-- Next, Skip the next step and proceed to Client Section for more instructions for now
+- Next, proceed to Client Section for more instructions
 - Come back here after setting up your ngrok connection
 - Setup webhook events using your ngrok URL
 - You should listen to the following 8 events

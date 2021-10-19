@@ -46,14 +46,6 @@ const Invoices = db.define(
                 key: "stripe_subscription_id"
             }
         },
-        stripe_period_start: {
-            type: "TIMESTAMP",
-            allowNull: true
-        },
-        stripe_period_end: {
-            type: "TIMESTAMP",
-            allowNull: true
-        },
         stripe_payment_method_fingerprint: {
             type: DataTypes.STRING(255),
             allowNull: true

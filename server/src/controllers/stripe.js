@@ -561,8 +561,6 @@ module.exports.handleWebhook = async (req, res) => {
                                 amount,
                                 balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                 fk_stripe_subscription_id: subscriptionID,
-                                stripe_period_start: currentPeriodStart,
-                                stripe_period_end: currentPeriodEnd,
                                 stripe_payment_method_fingerprint: cardFingerprint,
                                 stripe_card_exp_date: cardExpDate,
                                 stripe_card_last_four_digit: cardLastFourDigit,
@@ -581,8 +579,7 @@ module.exports.handleWebhook = async (req, res) => {
                                 amount,
                                 balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                 fk_stripe_subscription_id: subscriptionID,
-                                stripe_period_start: currentPeriodStart,
-                                stripe_period_end: currentPeriodEnd,
+
                                 stripe_payment_method_fingerprint: cardFingerprint,
                                 stripe_card_exp_date: cardExpDate,
                                 stripe_card_last_four_digit: cardLastFourDigit,
@@ -604,8 +601,6 @@ module.exports.handleWebhook = async (req, res) => {
                                 amount,
                                 balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                 fk_stripe_subscription_id: subscriptionID,
-                                stripe_period_start: currentPeriodStart,
-                                stripe_period_end: currentPeriodEnd,
                                 paid_on: new Date()
                             });
                         } else {
@@ -617,8 +612,6 @@ module.exports.handleWebhook = async (req, res) => {
                                 amount,
                                 balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                 fk_stripe_subscription_id: subscriptionID,
-                                stripe_period_start: currentPeriodStart,
-                                stripe_period_end: currentPeriodEnd,
                                 paid_on: new Date()
                             });
                         }
@@ -658,8 +651,6 @@ module.exports.handleWebhook = async (req, res) => {
                                     amount,
                                     balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                     fk_stripe_subscription_id: subscriptionID,
-                                    stripe_period_start: currentPeriodStart,
-                                    stripe_period_end: currentPeriodEnd
                                 });
                             } else {
                                 // Insert invoice
@@ -669,8 +660,6 @@ module.exports.handleWebhook = async (req, res) => {
                                     amount,
                                     balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                                     fk_stripe_subscription_id: subscriptionID,
-                                    stripe_period_start: currentPeriodStart,
-                                    stripe_period_end: currentPeriodEnd
                                 });
                             }
                         }
@@ -723,8 +712,6 @@ module.exports.handleWebhook = async (req, res) => {
                         amount,
                         balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                         fk_stripe_subscription_id: subscriptionID,
-                        stripe_period_start: currentPeriodStart,
-                        stripe_period_end: currentPeriodEnd
                     });
                 } else {
                     const paymentIntentID = invoice.payment_intent;
@@ -741,8 +728,6 @@ module.exports.handleWebhook = async (req, res) => {
                         amount,
                         balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                         fk_stripe_subscription_id: subscriptionID,
-                        stripe_period_start: currentPeriodStart,
-                        stripe_period_end: currentPeriodEnd
                     });
                 }
 
@@ -772,8 +757,6 @@ module.exports.handleWebhook = async (req, res) => {
                         amount,
                         balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                         fk_stripe_subscription_id: subscriptionID,
-                        stripe_period_start: currentPeriodStart,
-                        stripe_period_end: currentPeriodEnd
                     });
                 } else {
                     const paymentIntentID = invoice.payment_intent;
@@ -790,8 +773,6 @@ module.exports.handleWebhook = async (req, res) => {
                         amount,
                         balance: parseFloat(invoice.ending_balance / 100).toFixed(2),
                         fk_stripe_subscription_id: subscriptionID,
-                        stripe_period_start: currentPeriodStart,
-                        stripe_period_end: currentPeriodEnd
                     });
                 }
 
