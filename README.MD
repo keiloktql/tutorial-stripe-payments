@@ -12,7 +12,7 @@ This system is a simple user management system with subscription plans and one t
 - Next, proceed to Client Section for more instructions
 - Come back here after setting up your ngrok connection
 - Setup webhook events using your ngrok URL
-- You should listen to the following 8 events
+- You should listen to the following 7 events
   - customer.subscription.updated
   - customer.updated
   - invoice.paid
