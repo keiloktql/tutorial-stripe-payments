@@ -632,7 +632,7 @@ module.exports.handleWebhook = async (req, res) => {
             case 'customer.subscription.updated': {
                 const subscription = event.data.object;
                 const subscriptionID = subscription.id;
-                const subscriptionStatus = subscription.status;
+                let subscriptionStatus = subscription.status;
 
                 if (subscriptionStatus === "incomplete_expired") {
                     // Delete subscription in database if subscription status is 'incomplete_expired'
@@ -680,6 +680,13 @@ module.exports.handleWebhook = async (req, res) => {
                     // New billing cycle date
                     const subscriptionPeriodStart = dayjs(subscription.current_period_start * 1000).toDate(); // dayjs function converts unix time to native Date Object
                     const subscriptionPeriodEnd = dayjs(subscription.current_period_end * 1000).toDate();
+
+                    if (subscription.cancel_at_period_end) {
+                        // subscription is in canceling state
+                        if (subscription.cancel_at > Math.floor(Date.now() / 1000)) {
+                            subscriptionStatus = "canceling";
+                        }
+                    } 
 
                     // Update plan, subscription status, and new billing cycle in our Database
                     updateSubscription(subscriptionID, {

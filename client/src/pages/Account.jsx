@@ -111,6 +111,7 @@ const Account = () => {
                             last4: activeSubscription.payment_method?.stripe_card_last_four_digit,
                             cardType: activeSubscription.payment_method?.stripe_card_type,
                         }));
+                        
                         if (activeSubscription.invoice) {
                             // Set Billing history
                             setBillingHistory(() => activeSubscription.invoice.map((invoice, index) => ({
