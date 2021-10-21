@@ -75,7 +75,7 @@ const PlansCheckout = ({ match }) => {
                 const responseData = response.data;
                 console.log(responseData);
                 const account = responseData.account;
-                const liveSubscription = responseData.liveSubscription;
+                const activeSubscription = responseData.activeSubscription;
 
                 if (componentMounted) {
                     // Check if user has any payment methods type stored already
@@ -90,20 +90,11 @@ const PlansCheckout = ({ match }) => {
                         setPaymentMethods(() => []);
                     }
 
-                    // Check if user already has live subscription
-                    // live means subscription status aka stripe_status can be: 
-                    // 'incomplete', 'active', 'trialing', 'past_due'
-                    if (liveSubscription) {
-                        // User has pending payment for new subscription
-                        if (liveSubscription.stripe_status === "incomplete") {
-                            setClientSecret(() => liveSubscription.invoice[0].stripe_client_secret);
-                        }
-                        // User has existing active subscription
-                        // active means subscription status aka stripe_status can be:
-                        // 'active', 'trialing', 'past_due'
-                        else {
-                            setIsSubscriber(() => true);
-                        }
+                    // Check if user already has active subscription
+                    // active means subscription status aka stripe_status can be:
+                    // 'active', 'trialing', 'past_due', 'canceling'
+                    if (activeSubscription) {
+                        setIsSubscriber(() => true);
                     } else {
                         // Check if it's user's first time subscribing
                         if (!account.trialed) {

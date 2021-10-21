@@ -38,23 +38,15 @@ const ChangePlan = () => {
 
                 const responseData = response.data;
                 console.log(responseData);
-                const liveSubscription = responseData.liveSubscription;
+                const activeSubscription = responseData.activeSubscription;
                 if (componentMounted) {
-                    // Check if user already has live subscription
-                    // live means subscription status aka stripe_status can be: 
-                    // 'incomplete', 'active', 'trialing', 'past_due'
-                    if (liveSubscription) {
-                        // User has pending payment for new subscription
-                        if (liveSubscription.stripe_status === "incomplete") {
-                            setActivePlanExist(() => false);
-                        }
+                    // Check if user already has active subscription
+                    // active means subscription status aka stripe_status can be:
+                    // 'active', 'trialing', 'past_due', 'canceling'
+                    if (activeSubscription) {
                         // User has existing active subscription
-                        // active means subscription status aka stripe_status can be:
-                        // 'active', 'trialing', 'past_due'
-                        else {
-                            setCurrentPlan(() => liveSubscription.plan.plan_id);
-                            setActivePlanExist(() => true);
-                        }
+                        setCurrentPlan(() => activeSubscription.plan.plan_id);
+                        setActivePlanExist(() => true);
                     } else {
                         setActivePlanExist(() => false);
                     }
@@ -146,9 +138,9 @@ const ChangePlan = () => {
                                     <div className="c-Change-plan__Top">
                                         <h1 className="c-Change-plan__Heading">Change Plan</h1>
                                         <p>Changing of subscription plan during free trial will not incur any charge.<br />
-                                        After free trial, upgrading a subscription will incur a prorated charge immediately.<br/>
-                                        Downgrading subscription will result in credits to your account balance which will be applied in your next billing date.
-                                         </p>
+                                            After free trial, upgrading a subscription will incur a prorated charge immediately.<br />
+                                            Downgrading subscription will result in credits to your account balance which will be applied in your next billing date.
+                                        </p>
                                     </div>
 
                                     <div className="c-Change-plan__Cards">

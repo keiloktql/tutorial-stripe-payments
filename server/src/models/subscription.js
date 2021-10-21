@@ -30,29 +30,6 @@ module.exports.deleteSubscription = (subscriptionID) => Subscriptions.destroy({
     }
 });
 
-// Find live subscriptions
-// live means subscription status aka stripe_status can be: 
-// 'incomplete', 'active', 'trialing', 'past_due', 'canceling'
-module.exports.findLiveSubscription = (accountID) => Subscriptions.findOne({
-    where: {
-        fk_account_id: accountID,
-        stripe_status: {
-            [Op.ne]: "canceled"
-        }
-    },
-    include: [{
-        model: Plans,
-        as: "plan"
-    }, {
-        model: Invoices,
-        as: "invoice",
-        order: [['paid_on', 'DESC']]
-    }, {
-        model: PaymentMethods,
-        as: "payment_method"
-    }] 
-});
-
 // Find active subscriptiobs
 // active means subscription status aka stripe_status can be:
 // 'active', 'trialing', 'past_due', 'canceling'
@@ -60,7 +37,7 @@ module.exports.findActiveSubscription = (accountID) => Subscriptions.findOne({
     where: {
         fk_account_id: accountID,
         stripe_status: {
-            [Op.notIn]: ["canceled", "incomplete"]
+            [Op.notIn]: ["canceled"]
         }
     },
     include: [{

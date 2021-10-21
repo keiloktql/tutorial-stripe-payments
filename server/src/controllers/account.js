@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 
 const { findAccountByID, createAccount, updateAccountByID } = require('../models/account');
-const { findLiveSubscription } = require("../models/subscription");
+const { findActiveSubscription } = require("../models/subscription");
 const { createStripeCustomer, updateStripeCustomer } = require('../services/stripe');
 
 // Get account by ID
@@ -19,11 +19,11 @@ module.exports.findAccountByID = async (req, res) => {
             message: `\"accountID\" ${accountID} not found`
         });
 
-        const liveSubscription = await findLiveSubscription(accountID);
+        const activeSubscription = await findActiveSubscription(accountID);
 
         return res.status(200).send({
             account,
-            liveSubscription
+            activeSubscription
         });
 
     } catch (error) {

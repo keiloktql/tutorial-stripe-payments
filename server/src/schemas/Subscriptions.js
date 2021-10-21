@@ -40,7 +40,7 @@ const Subscriptions = db.define(
             }
         },
         stripe_status: {
-            type: DataTypes.ENUM(["active", "canceled", "canceling", "incomplete", "trialing", "past_due"]),
+            type: DataTypes.ENUM(["active", "canceled", "canceling", "trialing", "past_due"]),
             allowNull: true
         },
         trial_end: {
