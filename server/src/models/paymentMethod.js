@@ -33,13 +33,13 @@ module.exports.insertPaymentMethod = async (accountID, paymentMethodID, cardFing
 
 // Update Payment Method
 module.exports.updatePaymentMethod = (paymentMethodID, cardFingerprint, cardLastFourDigit, cardType, cardExpDate) => PaymentMethods.update({
-    payment_method_fingerprint: cardFingerprint,
-    last_four_digit: cardLastFourDigit,
-    card_type: cardType,
-    card_exp_date: cardExpDate,
+    stripe_payment_method_fingerprint: cardFingerprint,
+    stripe_last_four_digit: cardLastFourDigit,
+    stripe_card_type: cardType,
+    stripe_card_exp_date: cardExpDate,
 }, {
     where: {
-        payment_method_id: paymentMethodID
+        stripe_payment_method_id: paymentMethodID
     }
 });
 
