@@ -9,6 +9,7 @@ const { Products } = require("./src/schemas/Products");
 const { Subscriptions } = require("./src/schemas/Subscriptions");
 
 const express = require("express");
+const bodyParser = require('body-parser');
 const cors = require("cors");
 const chalk = require('chalk');
 
@@ -26,6 +27,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
+app.use('/api/v1/webhooks/stripe', express.raw({type: "*/*"}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

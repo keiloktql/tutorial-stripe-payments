@@ -1,20 +1,17 @@
 const config = require("../config/config");
-const { findAccountByID } = require("../models/account");
 const { findActiveSubscription } = require("../models/subscription");
 
 // Check whether webhook request is from Stripe
 module.exports.verifyStripeWebhookRequest = async (req, res, next) => {
     try {
-        const event = req.body;
         // WEBHOOK SECRET
         const endpointSecret = config.stripe.test.webhookSecret;
         const stripe = require("stripe")(config.stripe.test.secretKey);
-
         if (endpointSecret) {
             // Get the signature sent by Stripe
             const signature = req.headers['stripe-signature'];
             try {
-                event = stripe.webhooks.constructEvent(
+                const event = stripe.webhooks.constructEvent(
                     req.body,
                     signature,
                     endpointSecret
@@ -23,8 +20,11 @@ module.exports.verifyStripeWebhookRequest = async (req, res, next) => {
                 res.locals.event = event;
             } catch (err) {
                 console.log(`Webhook signature verification failed.`, err.message);
-                return response.sendStatus(400);
+                return res.sendStatus(400);
             }
+        } else {
+            console.log(`Webhook secret not provided.`);
+            return res.sendStatus(400);
         }
         return next();
     }

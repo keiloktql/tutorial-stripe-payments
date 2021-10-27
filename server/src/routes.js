@@ -1,3 +1,6 @@
+const bodyParser = require('body-parser');
+const express = require('express');
+
 // CONTROLLERS
 const accountController = require("./controllers/account");
 const authController = require("./controllers/auth");
