@@ -425,7 +425,7 @@ module.exports.cancelSubscription = async (req, res) => {
 // Webhooks
 module.exports.handleWebhook = async (req, res) => {
     try {
-        const event = req.body;
+        const { event } = res.locals;
 
         // Types of events: https://stripe.com/docs/api/events/types
         switch (event.type) {
