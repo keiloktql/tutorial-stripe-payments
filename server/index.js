@@ -9,7 +9,6 @@ const { Products } = require("./src/schemas/Products");
 const { Subscriptions } = require("./src/schemas/Subscriptions");
 
 const express = require("express");
-const bodyParser = require('body-parser');
 const cors = require("cors");
 const chalk = require('chalk');
 
