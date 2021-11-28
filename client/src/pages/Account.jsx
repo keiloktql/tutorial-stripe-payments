@@ -80,7 +80,7 @@ const Account = () => {
                             cardType: paymentAccount.stripe_card_type,
                             last4: paymentAccount.stripe_card_last_four_digit,
                             expDate: paymentAccount.stripe_card_exp_date,
-                            stripepPaymentMethodID: paymentAccount.stripe_payment_method_id,
+                            stripePaymentMethodID: paymentAccount.stripe_payment_method_id,
                             createdAt: dayjs(new Date(paymentAccount.created_at)).format("MMMM D, YYYY h:mm A"),
                             action_delete: paymentAccount.stripe_payment_method_id,
                         })));
