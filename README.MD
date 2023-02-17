@@ -1,4 +1,5 @@
 # Repo for 'Stripe with React & NodeJS' guide.
+> Note: The guide might be outdated for the current version of Stripe payments.
 
 Simple user management system with subscription plans and one time payment. The pdf version of the guide can be found in docs folder.
 
